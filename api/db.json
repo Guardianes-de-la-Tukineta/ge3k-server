@@ -1,0 +1,25 @@
+{  "products" : [ 
+    {
+    "id "  : "1",  
+    "name" : "Star Wars Shirt",
+    "price": 20,   
+    "image": "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/7c13a219bffe4ac2866fad1100c96fec_9366/Camiseta_Estampada_adidas_x_Star_Wars_The_Mandalorian_Blanco_GS6223_01_laydown.jpg",
+    "description" : "Cool Star Wars Shirt ",
+    "category1" : "Wear",
+    "category2" : "Movies",
+    "stock" : 12
+
+    },
+    {
+        "id "  : "2",  
+        "name" : "Mug Programmer",
+        "price": 5,   
+        "image": "https://i.pinimg.com/564x/7c/ef/bf/7cefbf89e0f4325ffff1438c27ca306a.jpg",
+        "description" : " Mug for your large hours programming with a nice style",
+        "category1" : "Mugs",
+        "category2" : "",
+        "stock" : 8
+    }
+   ]
+
+}
