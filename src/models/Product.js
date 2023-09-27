@@ -1,12 +1,13 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-    sequelize.define('Product', {
+  sequelize.define(
+    "Product",
+    {
       id: {
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
       },
       name: {
         type: DataTypes.STRING,
@@ -24,25 +25,17 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      category1: {
-        //geek, movies, anime, wear
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      category2: {
-        //geek, movies, anime, wear
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      category3: {
-        //geek, movies, anime, wear
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
       stock: {
         //units available on inventary
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-    });
+      discount: {
+        type: DataTypes.INTEGER,
+      },
+    },
+    {
+      paranoid: true,
+    }
+  );
 };
