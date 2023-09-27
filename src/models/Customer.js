@@ -1,22 +1,35 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-    sequelize.define('User', {
+  sequelize.define(
+    "Customer",
+    {
       id: {
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
       },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [10, 50],
+          len: [2, 20],
         },
       },
+      surname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          len: [2, 20],
+        },
+      },
+      birthdate: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+      },
+
       email: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -35,10 +48,17 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      paymentMethod: {
+        type: DataTypes.STRING,
+      },
       category: {
         //premium, rookie or invite
         type: DataTypes.STRING,
         allowNull: false,
       },
-    });
+    },
+    {
+      paranoid: true,
+    }
+  );
 };
