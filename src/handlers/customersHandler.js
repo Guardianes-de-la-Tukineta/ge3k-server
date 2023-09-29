@@ -1,4 +1,8 @@
-const { getAllCustomers, searchCustomerByName } = require('../controllers/customersController');
+const {
+  getAllCustomers,
+  searchCustomerByName,
+  createNewCustomer
+} = require('../controllers/customersController');
 
 const getCustomersHandler = async (req, res) => {
   const { name } = req.query;
@@ -12,6 +16,23 @@ const getCustomersHandler = async (req, res) => {
   }
 };
 
+const createCustomerHandler = async (req, res) => {
+  try {
+    const customerData = req.body;
+
+    const newCustomer = await createNewCustomer(customerData);
+
+    return res.status(201).json({
+      message: 'Cliente creado exitosamente',
+      customerId: newCustomer.id,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getCustomersHandler,
+  createCustomerHandler,
 };

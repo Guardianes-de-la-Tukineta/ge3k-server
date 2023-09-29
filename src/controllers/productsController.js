@@ -1,22 +1,10 @@
-const { Product, Category, Theme } = require('../db');
+const { Product } = require('../db');
+const { Op } = require('sequelize');
 
-//getData from 5000
 const getAllProducts = async () => {
   try {
-    const products = await Product.findAll({
-      include: {
-        model: Category,
-        attributes: ['id', 'name'],
-        through: {
-          attributes: [],
-        },
-        model: Theme,
-        attributes: ['id', 'name'],
-        through: {
-          attributes: [],
-        },
-      },
-    });
+    const products = await Product.findAll();
+
     return products;
   } catch (error) {
     throw error;
@@ -28,7 +16,7 @@ const searchProductByName = async (productName) => {
     const results = await Product.findAll({
       where: {
         name: {
-          [Sequelize.Op.iLike]: `%${productName}%`, //* Búsqueda inexacta (y tampoco distingue mayúsculas/minúsculas)
+          [Op.iLike]: `%${productName}%`, //* Búsqueda inexacta (y tampoco distingue mayúsculas/minúsculas)
         },
       },
     });
@@ -38,4 +26,30 @@ const searchProductByName = async (productName) => {
   }
 };
 
-module.exports = { getAllProducts, searchProductByName };
+const createNewProduct = async (product) => {
+  try {
+    const {
+      name,
+      price,
+      image,
+      description,
+      stock,
+      discount,
+    } = product;
+
+    const newProduct = await Product.create({
+      name,
+      price,
+      image,
+      description,
+      stock,
+      discount,
+    });
+
+    return newProduct;
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = { getAllProducts, searchProductByName, createNewProduct };
