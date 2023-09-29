@@ -2,6 +2,7 @@ const {
   getAllProducts,
   searchProductByName,
   createNewProduct,
+  getProductById,
 } = require('../controllers/productsController');
 
 const getProductsHandler = async (req, res) => {
@@ -32,7 +33,23 @@ const createProductHandler = async (req, res) => {
   }
 };
 
+const getProductByIdHandler = async (req, res) => { 
+  try {
+    const { id } = req.params;
+
+    const productById = await getProductById(id);
+
+    return productById
+      ? res.status(200).json(productById)
+      : res.status(404).json({ message: 'Producto no encontrado.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   getProductsHandler,
   createProductHandler,
+  getProductByIdHandler,
 };
