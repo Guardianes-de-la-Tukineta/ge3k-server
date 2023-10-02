@@ -1,5 +1,7 @@
-const { Product, Category,Theme } = require('../db');
-const { Op } = require('sequelize');
+const { Product, Category, Theme } = require("../db");
+const { Op } = require("sequelize");
+const { bulkCreateNewTheme } = require("./themesController");
+const { bulkCreateNewCategory } = require("./categoriesController");
 
 const getAllProducts = async () => {
   try {
@@ -22,7 +24,7 @@ const searchProductByName = async (productName) => {
     });
     return results;
   } catch (error) {
-    throw new Error('Error al buscar productos por nombre');
+    throw new Error("Error al buscar productos por nombre");
   }
 };
 
@@ -36,7 +38,7 @@ const createNewProduct = async (product) => {
       stock,
       discount,
       categoryName,
-      themeName
+      themeName,
     } = product;
 
     const newProduct = await Product.create({
@@ -45,22 +47,22 @@ const createNewProduct = async (product) => {
       image,
       description,
       stock,
-      discount
+      discount,
     });
 
     //* acá lo que intenté hacer es que se fije si existe o no ese ID de categoría, así determina si debe o no crear una categoría nueva
     let category = null;
     if (categoryName) {
-      category = await Category.findOne({where:{name:categoryName}});
+      category = await Category.findOne({ where: { name: categoryName } });
       if (!category) {
         category = await Category.create({ name: categoryName });
       }
     }
-    
+
     //* IDEM a lo que intenté con categoría
     let theme = null;
     if (themeName) {
-      theme = await Theme.findOne({where:{name:themeName}});
+      theme = await Theme.findOne({ where: { name: themeName } });
       if (!theme) {
         theme = await Theme.create({ name: themeName });
       }
@@ -81,7 +83,76 @@ const createNewProduct = async (product) => {
   }
 };
 
-const createBulkNewProduct = async () => {}
+const createBulkNewProduct = async (bulkData) => {
+  let dbCategoriesNames = await Category.findAll();
+
+  if (dbCategoriesNames)
+    dbCategoriesNames = dbCategoriesNames.map((category) => category.name);
+
+  let dbThemesNames = await Theme.findAll();
+
+  if (dbThemesNames) dbThemesNames = dbThemesNames.map((theme) => theme.name);
+
+  let newCategories = [];
+  bulkData
+    .map((product) => product.categoryName)
+    .forEach((category) => {
+      if (
+        !dbCategoriesNames.includes(category) &&
+        !newCategories.includes(category)
+      )
+        newCategories.push(category);
+    });
+
+  newCategories = newCategories.map((category) => ({ name: category }));
+
+  let newThemes = [];
+  bulkData
+    .map((product) => product.themeName)
+    .forEach((theme) => {
+      if (!dbThemesNames.includes(theme) && !newThemes.includes(theme))
+        newThemes.push(theme);
+    });
+
+  newThemes = newThemes.map((theme) => ({ name: theme }));
+
+  await bulkCreateNewCategory(newCategories);
+  await bulkCreateNewTheme(newThemes);
+
+  const dbCategories = await Category.findAll();
+  const dbThemes = await Theme.findAll();
+
+  const data = bulkData.map((product) => {
+    const {
+      name,
+      price,
+      image,
+      description,
+      discount,
+      stock,
+      categoryName,
+      themeName,
+    } = product;
+
+    const CategoryId = dbCategories.find(
+      (category) => category.name === categoryName
+    ).id;
+    const ThemeId = dbThemes.find((theme) => theme.name === themeName).id;
+
+    return {
+      name,
+      price,
+      image,
+      description,
+      discount,
+      stock,
+      CategoryId,
+      ThemeId,
+    };
+  });
+
+  await Product.bulkCreate(data);
+};
 
 const getProductById = async (id) => {
   try {
@@ -91,7 +162,6 @@ const getProductById = async (id) => {
     throw error;
   }
 };
-
 
 module.exports = {
   getAllProducts,
