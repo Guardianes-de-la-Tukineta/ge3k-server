@@ -24,7 +24,7 @@ const {
       const newTheme = await createNewTheme(themeData);
   
       return res.status(201).json({
-        message: 'Cliente creado exitosamente',
+        message: 'Tema creado exitosamente',
         themeId: newTheme.id,
       });
     } catch (error) {
@@ -40,7 +40,7 @@ const {
   
       return themeById
         ? res.status(200).json(themeById)
-        : res.status(404).json({ message: 'Theme no encontrado.' });
+        : res.status(404).json({ message: 'Tema no encontrado.' });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: error.message });
