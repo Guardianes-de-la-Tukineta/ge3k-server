@@ -38,6 +38,7 @@ const createBulkProductHandler = async (req, res) => {
   try {
     const bulkData = req.body;
     const bulkNewProduct = createBulkNewProduct(bulkData);
+    res.status(200).json(bulkNewProduct)
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

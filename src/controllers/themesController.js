@@ -40,4 +40,8 @@ const createNewTheme = async (theme) => {
     
 }
 
-module.exports = { getAllThemes, searchThemeByName, getThemeById, createNewTheme };
+const bulkCreateNewTheme=async (themes) => {
+  Theme.bulkCreate(themes)
+}
+
+module.exports = { getAllThemes, searchThemeByName, getThemeById, createNewTheme, bulkCreateNewTheme };
