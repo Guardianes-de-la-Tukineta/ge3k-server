@@ -19,13 +19,13 @@ const getCategoriesHandler = async (req, res) => {
 
 const createCategoryHandler = async (req, res) => {
   try {
-    const productData = req.body;
+    const categoryData = req.body;
 
-    const newCategory = await createNewCategory(productData);
+    const newCategory = await createNewCategory(categoryData);
 
     return res.status(201).json({
-      message: 'Categoryo creado exitosamente',
-      productId: newCategory.id,
+      message: 'Category creada exitosamente',
+      categoryId: newCategory.id,
     });
   } catch (error) {
     console.error(error);
@@ -41,7 +41,7 @@ const getCategoryByIdHandler = async (req, res) => {
 
     return productById
       ? res.status(200).json(productById)
-      : res.status(404).json({ message: 'Categoryo no encontrado.' });
+      : res.status(404).json({ message: 'Categoria no encontrada.' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
