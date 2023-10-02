@@ -2,7 +2,6 @@ const {
   getAllThemes,
   searchThemeByName,
   createNewTheme,
-  bulkCreateNewTheme,
   getThemeById,
 } = require("../controllers/themesController");
 
@@ -32,16 +31,6 @@ const createThemeHandler = async (req, res) => {
   }
 };
 
-const bulkCreateThemeHandler = async (req, res) => {
-  try {
-    const { themes } = req.body;
-    bulkCreateNewTheme(themes);
-    res.status(200).json({ message: "themes created" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 const getThemeByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -60,6 +49,5 @@ const getThemeByIdHandler = async (req, res) => {
 module.exports = {
   getThemesHandler,
   createThemeHandler,
-  bulkCreateThemeHandler,
   getThemeByIdHandler,
 };
