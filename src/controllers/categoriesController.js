@@ -30,8 +30,7 @@ const createNewCategory = async (category) => {
 };
 
 const bulkCreateNewCategory = async (categories) => {
-  // console.log(categories);
-  Category.bulkCreate(categories);
+  await Category.bulkCreate(categories);
 };
 
 module.exports = {
