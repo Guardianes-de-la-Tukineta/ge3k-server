@@ -1,4 +1,4 @@
-const { Product } = require('../db');
+const { Product, Category,Theme } = require('../db');
 const { Op } = require('sequelize');
 
 const getAllProducts = async () => {
@@ -35,6 +35,8 @@ const createNewProduct = async (product) => {
       description,
       stock,
       discount,
+      categoryName,
+      themeName
     } = product;
 
     const newProduct = await Product.create({
@@ -43,14 +45,43 @@ const createNewProduct = async (product) => {
       image,
       description,
       stock,
-      discount,
+      discount
     });
+
+    //* acá lo que intenté hacer es que se fije si existe o no ese ID de categoría, así determina si debe o no crear una categoría nueva
+    let category = null;
+    if (categoryName) {
+      category = await Category.findOne({where:{name:categoryName}});
+      if (!category) {
+        category = await Category.create({ name: categoryName });
+      }
+    }
+    
+    //* IDEM a lo que intenté con categoría
+    let theme = null;
+    if (themeName) {
+      theme = await Theme.findOne({where:{name:themeName}});
+      if (!theme) {
+        theme = await Theme.create({ name: themeName });
+      }
+    }
+
+    //* y acá es cuando asocio, al nuevo producto, con la categoría/temática correspondiente
+    if (category) {
+      await newProduct.setCategory(category.id);
+    }
+
+    if (theme) {
+      await newProduct.setTheme(theme.id);
+    }
 
     return newProduct;
   } catch (error) {
     throw error;
   }
 };
+
+const createBulkNewProduct = async () => {}
 
 const getProductById = async (id) => {
   try {
@@ -66,5 +97,6 @@ module.exports = {
   getAllProducts,
   searchProductByName,
   createNewProduct,
+  createBulkNewProduct,
   getProductById,
 };
