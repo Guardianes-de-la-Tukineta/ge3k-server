@@ -12,7 +12,6 @@ const getAllCustomers = async () => {
 };
 
 const searchCustomerByName = async (customerName) => {
-  console.log(customerName);
   try {
     const results = await Customer.findAll({
       where: {

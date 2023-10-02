@@ -2,8 +2,9 @@ const {
   getAllProducts,
   searchProductByName,
   createNewProduct,
+  createBulkNewProduct,
   getProductById,
-} = require('../controllers/productsController');
+} = require("../controllers/productsController");
 
 const getProductsHandler = async (req, res) => {
   const { name } = req.query;
@@ -24,7 +25,7 @@ const createProductHandler = async (req, res) => {
     const newProduct = await createNewProduct(productData);
 
     return res.status(201).json({
-      message: 'Producto creado exitosamente',
+      message: "Producto creado exitosamente",
       productId: newProduct.id,
     });
   } catch (error) {
@@ -33,7 +34,16 @@ const createProductHandler = async (req, res) => {
   }
 };
 
-const getProductByIdHandler = async (req, res) => { 
+const createBulkProductHandler = async (req, res) => {
+  try {
+    const bulkData = req.body;
+    const bulkNewProduct = createBulkNewProduct(bulkData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getProductByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -41,15 +51,16 @@ const getProductByIdHandler = async (req, res) => {
 
     return productById
       ? res.status(200).json(productById)
-      : res.status(404).json({ message: 'Producto no encontrado.' });
+      : res.status(404).json({ message: "Producto no encontrado." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
-}
+};
 
 module.exports = {
   getProductsHandler,
   createProductHandler,
+  createBulkProductHandler,
   getProductByIdHandler,
 };

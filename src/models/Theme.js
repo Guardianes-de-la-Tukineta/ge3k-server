@@ -5,9 +5,9 @@ module.exports = (sequelize) => {
     "Theme",
     {
       id: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         primaryKey: true,
-        defaultValue: DataTypes.UUIDV4,
+        autoIncrement: true,
       },
       name: {
         type: DataTypes.STRING,
