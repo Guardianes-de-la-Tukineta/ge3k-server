@@ -2,12 +2,15 @@ const { Product, Category, Theme } = require("../db");
 const { Op } = require("sequelize");
 const { bulkCreateNewTheme } = require("./themesController");
 const { bulkCreateNewCategory } = require("./categoriesController");
+const { productFormat } = require("../utils/utils");
 
 const getAllProducts = async () => {
   try {
-    const products = await Product.findAll();
+    const products = await Product.findAll({
+      include: [{ model: Category }, { model: Theme }],
+    });
 
-    return products;
+    return products.map((product) => productFormat(product));
   } catch (error) {
     throw error;
   }
@@ -21,8 +24,9 @@ const searchProductByName = async (productName) => {
           [Op.iLike]: `%${productName}%`, //* Búsqueda inexacta (y tampoco distingue mayúsculas/minúsculas)
         },
       },
+      include: [{ model: Category }, { model: Theme }],
     });
-    return results;
+    return results.map((result) => productFormat(result));
   } catch (error) {
     throw new Error("Error al buscar productos por nombre");
   }
@@ -156,8 +160,10 @@ const createBulkNewProduct = async (bulkData) => {
 
 const getProductById = async (id) => {
   try {
-    const product = await Product.findByPk(id);
-    return product ? product : null;
+    const product = await Product.findByPk(id, {
+      include: [{ model: Category }, { model: Theme }],
+    });
+    return product ? productFormat(product) : null;
   } catch (error) {
     throw error;
   }
