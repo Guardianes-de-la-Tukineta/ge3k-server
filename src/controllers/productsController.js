@@ -1,8 +1,8 @@
-const { Product, Category, Theme } = require("../db");
-const { Op } = require("sequelize");
-const { bulkCreateNewTheme } = require("./themesController");
-const { bulkCreateNewCategory } = require("./categoriesController");
-const { productFormat } = require("../utils/utils");
+const { Product, Category, Theme } = require('../db');
+const { Op } = require('sequelize');
+const { bulkCreateNewTheme } = require('./themesController');
+const { bulkCreateNewCategory } = require('./categoriesController');
+const { productFormat } = require('../utils/utils');
 
 const getAllProducts = async () => {
   try {
@@ -28,7 +28,7 @@ const searchProductByName = async (productName) => {
     });
     return results.map((result) => productFormat(result));
   } catch (error) {
-    throw new Error("Error al buscar productos por nombre");
+    throw new Error('Error al buscar productos por nombre');
   }
 };
 
@@ -169,10 +169,23 @@ const getProductById = async (id) => {
   }
 };
 
+const deleteProductById = async (id) => {
+  try {
+    const product = await Product.findByPk(id);
+    if (!product) {
+      throw new Error('Producto no encontrado');
+    }
+    await product.destroy();
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getAllProducts,
   searchProductByName,
   createNewProduct,
   createBulkNewProduct,
   getProductById,
+  deleteProductById,
 };
