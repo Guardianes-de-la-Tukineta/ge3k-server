@@ -24,4 +24,14 @@ const productFormat = (product) => {
   };
 };
 
-module.exports = { productFormat };
+const categoryFormat = (category) => {
+  const { id, name } = category;
+  return { id, name };
+};
+
+const themeFormat = (theme) => {
+  const { id, name } = theme;
+  return { id, name };
+};
+
+module.exports = { productFormat, categoryFormat, themeFormat };

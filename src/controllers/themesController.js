@@ -1,13 +1,13 @@
 const { Theme } = require("../db");
 const { Op } = require("sequelize");
+const { themeFormat } = require("../utils/utils");
 
 const getAllThemes = async () => {
   const themes = await Theme.findAll();
-  return themes;
+  return themes.map(theme=>themeFormat(theme));
 };
 
 const searchThemeByName = async (themeName) => {
-  console.log(themeName);
   const results = await Theme.findAll({
     where: {
       name: {
@@ -15,12 +15,12 @@ const searchThemeByName = async (themeName) => {
       },
     },
   });
-  return results;
+  return results.map((result) => themeFormat(result));
 };
 
 const getThemeById = async (id) => {
   const theme = await Theme.findByPk(id);
-  return theme ? theme : null;
+  return theme ? themeFormat(theme) : null;
 };
 const createNewTheme = async (theme) => {
   const { name } = theme;
