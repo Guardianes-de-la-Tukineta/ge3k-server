@@ -1,13 +1,13 @@
 const { Category } = require("../db");
 const { Op } = require("sequelize");
+const { categoryFormat } = require("../utils/utils");
 
 const getAllCategories = async () => {
   const categories = await Category.findAll();
-  return categories;
+  return categories.map((category) => categoryFormat(category));
 };
 
 const searchCategoryByName = async (categoryName) => {
-  console.log(categoryName);
 
   const results = await Category.findAll({
     where: {
@@ -16,11 +16,11 @@ const searchCategoryByName = async (categoryName) => {
       },
     },
   });
-  return results;
+  return results.map((result) => categoryFormat(result));
 };
 const getCategoryById = async (id) => {
-  const category = await category.findByPk(id);
-  return category ? category : null;
+  const category = await Category.findByPk(id);
+  return category ? categoryFormat(category) : null;
 };
 
 const createNewCategory = async (category) => {
