@@ -181,6 +181,45 @@ const deleteProductById = async (id) => {
   }
 };
 
+const updateProductById = async (id, productData) => {
+  try {
+    const { name, price, image, description, stock, discount } = productData;
+
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return null; //* Esto es por si no puede encotnrar el producto
+    }
+
+    //* Acá lo que hago es que actualice ÚNICAMENTE los campos que le paso
+    if (name) {
+      product.name = name;
+    }
+    if (price) {
+      product.price = price;
+    }
+    if (image) {
+      product.image = image;
+    }
+    if (description) {
+      product.description = description;
+    }
+    if (stock) {
+      product.stock = stock;
+    }
+    if (discount !== undefined) {
+      product.discount = discount;
+    }
+
+    await product.save();
+
+    return product;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 module.exports = {
   getAllProducts,
   searchProductByName,
@@ -188,4 +227,5 @@ module.exports = {
   createBulkNewProduct,
   getProductById,
   deleteProductById,
+  updateProductById,
 };

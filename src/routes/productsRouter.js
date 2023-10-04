@@ -5,6 +5,7 @@ const {
   createBulkProductHandler,
   getProductByIdHandler,
   deleteProductHandler,
+  updateProductHandler,
 } = require('../handlers/productsHandler');
 
 const productsRouter = Router();
@@ -14,5 +15,6 @@ productsRouter.post('/', createProductHandler);
 productsRouter.post('/bulk', createBulkProductHandler);
 productsRouter.get('/:id', getProductByIdHandler);
 productsRouter.delete('/:id', deleteProductHandler);
+productsRouter.put('/:id', updateProductHandler);
 
 module.exports = productsRouter;
