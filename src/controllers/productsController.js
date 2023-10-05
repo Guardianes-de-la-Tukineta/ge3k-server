@@ -1,35 +1,71 @@
-const { Product, Category, Theme } = require('../db');
-const { Op } = require('sequelize');
-const { bulkCreateNewTheme } = require('./themesController');
-const { bulkCreateNewCategory } = require('./categoriesController');
-const { productFormat } = require('../utils/utils');
+const { Product, Category, Theme } = require("../db");
+const { Op } = require("sequelize");
+const { bulkCreateNewTheme } = require("./themesController");
+const { bulkCreateNewCategory } = require("./categoriesController");
+const { productFormat } = require("../utils/utils");
 
-const getAllProducts = async () => {
-  try {
-    const products = await Product.findAll({
-      include: [{ model: Category }, { model: Theme }],
-    });
+const getAllProducts = async (filterObject) => {
+  const {
+    categoryName,
+    themeName,
+    nameOrder,
+    priceOrder,
+    pageNumber,
+    unitsPerPage,
+    name,
+  } = filterObject;
 
-    return products.map((product) => productFormat(product));
-  } catch (error) {
-    throw error;
-  }
-};
+  let where = {};
 
-const searchProductByName = async (productName) => {
-  try {
-    const results = await Product.findAll({
-      where: {
-        name: {
-          [Op.iLike]: `%${productName}%`, //* Búsqueda inexacta (y tampoco distingue mayúsculas/minúsculas)
-        },
+  if (name) {
+    where = {
+      ...where,
+      name: {
+        [Op.iLike]: `%${name}%`, //* Búsqueda inexacta (y tampoco distingue mayúsculas/minúsculas)
       },
-      include: [{ model: Category }, { model: Theme }],
-    });
-    return results.map((result) => productFormat(result));
-  } catch (error) {
-    throw new Error('Error al buscar productos por nombre');
+    };
   }
+
+  if (categoryName) {
+    where = {
+      ...where,
+      CategoryId: (await Category.findOne({ where: { name: categoryName } }))
+        .id,
+    };
+  }
+
+  if (themeName) {
+    where = {
+      ...where,
+      ThemeId: (await Theme.findOne({ where: { name: themeName } })).id,
+    };
+  }
+
+  let order = [];
+
+  if (nameOrder) {
+    order = [...order, ["name", nameOrder]];
+  }
+
+  if (priceOrder) {
+    order = [...order, ["price", priceOrder]];
+  }
+
+  let limit, offset;
+  if (unitsPerPage) limit = unitsPerPage;
+  if (pageNumber) offset = unitsPerPage * (pageNumber - 1);
+
+  const specs = {
+    include: [{ model: Category }, { model: Theme }],
+    order,
+    where,
+    limit,
+    offset,
+  };
+
+  products = await Product.findAll(specs);
+
+  return products.map((product) => productFormat(product));
 };
 
 const createNewProduct = async (product) => {
@@ -173,7 +209,7 @@ const deleteProductById = async (id) => {
   try {
     const product = await Product.findByPk(id);
     if (!product) {
-      throw new Error('Producto no encontrado');
+      throw new Error("Producto no encontrado");
     }
     await product.destroy();
   } catch (error) {
@@ -219,10 +255,8 @@ const updateProductById = async (id, productData) => {
   }
 };
 
-
 module.exports = {
   getAllProducts,
-  searchProductByName,
   createNewProduct,
   createBulkNewProduct,
   getProductById,
