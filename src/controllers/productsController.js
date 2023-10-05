@@ -20,9 +20,10 @@ const getAllProducts = async (filterObject) => {
   if (name) {
     where = {
       ...where,
-      name: {
-        [Op.iLike]: `%${name}%`, //* Búsqueda inexacta (y tampoco distingue mayúsculas/minúsculas)
-      },
+      [Op.or]: [
+        { name: { [Op.iLike]: `%${name}%` } },
+        { description: { [Op.iLike]: `%${name}%` } },
+      ],
     };
   }
 
