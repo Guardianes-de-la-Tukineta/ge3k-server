@@ -1,7 +1,10 @@
 const {
   getAllCustomers,
   searchCustomerByName,
-  createNewCustomer
+  createNewCustomer,
+  getCustomerById,
+  deleteCustomerById,
+  updateCustomerById,
 } = require('../controllers/customersController');
 
 const getCustomersHandler = async (req, res) => {
@@ -32,7 +35,55 @@ const createCustomerHandler = async (req, res) => {
   }
 };
 
+const getCustomerByIdHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const customerById = await getCustomerById(id);
+
+    return customerById
+      ? res.status(200).json(customerById)
+      : res.status(404).json({ message: 'Cliente no encontrado.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteCustomerHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deleteCustomerById(id);
+    res.status(200).json({ message: `Cliente con id ${id} eliminado` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const updateCustomerHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const customerData = req.body;
+
+    const updatedCustomer = await updateCustomerById(id, customerData);
+
+    if (updatedCustomer) {
+      res.status(200).json({
+        message: `Cliente con ID ${id} actualizado exitosamente`,
+      });
+    } else {
+      res.status(404).json({ message: 'Cliente no encontrado.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getCustomersHandler,
   createCustomerHandler,
+  getCustomerByIdHandler,
+  deleteCustomerHandler,
+  updateCustomerHandler,
 };
