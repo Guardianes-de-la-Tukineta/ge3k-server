@@ -4,6 +4,7 @@ const customersRouter = require("./customersRouter");
 const favoritesRouter = require('./favoritesRouter');
 const categoriesRouter = require('./categoriesRouter');
 const themesRouter = require('./themesRouter');
+const cartsRouter = require('./cartsRouter');
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use('/customers', customersRouter);
 router.use('/favorites', favoritesRouter);
 router.use('/categories', categoriesRouter);
 router.use('/themes', themesRouter);
+router.use('/carts', cartsRouter);
 
 
 
