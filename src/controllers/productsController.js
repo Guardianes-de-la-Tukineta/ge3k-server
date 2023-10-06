@@ -256,6 +256,15 @@ const updateProductById = async (id, productData) => {
   }
 };
 
+const sugestProducts = async (sugest) => {
+  const products = await Product.findAll({
+    attributes: ["name"],
+    where: { name: { [Op.iLike]: `%${sugest}%` } },
+    limit: 5,
+  });
+  return products.map((product) => product.name);
+};
+
 module.exports = {
   getAllProducts,
   createNewProduct,
@@ -263,4 +272,5 @@ module.exports = {
   getProductById,
   deleteProductById,
   updateProductById,
+  sugestProducts,
 };
