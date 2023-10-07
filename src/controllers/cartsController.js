@@ -4,7 +4,7 @@ const { productFormat } = require("../utils/utils");
 const getCart = async (CustomerId) => {
   const rawCart = await Cart.findAll({
     where: { CustomerId },
-    attributes: [],
+    attributes: ["quantity"],
     include: [
       {
         model: Product,
@@ -15,8 +15,16 @@ const getCart = async (CustomerId) => {
       },
     ],
   });
-  const products = rawCart.map((rawProduct) => rawProduct.Product);
-  return products.map((product) => productFormat(product));
+
+  const products = rawCart.map((rawProduct) => {
+    const { quantity, Product } = rawProduct;
+    return {
+      product: productFormat(Product),
+      quantity,
+    };
+  });
+
+  return products;
 };
 
 const createNewCart = async (customerId, productId, quantity) => {
