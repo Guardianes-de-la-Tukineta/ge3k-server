@@ -7,8 +7,8 @@ const productFormat = (product) => {
     description,
     stock,
     discount,
-    Category: { name: category },
-    Theme: { name: theme },
+    Category: { name: categoryName },
+    Theme: { name: themeName },
   } = product;
 
   return {
@@ -19,8 +19,8 @@ const productFormat = (product) => {
     description,
     stock,
     discount,
-    category,
-    theme,
+    categoryName,
+    themeName,
   };
 };
 

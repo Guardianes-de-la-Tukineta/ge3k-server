@@ -1,19 +1,17 @@
 const {
   getAllProducts,
-  searchProductByName,
   createNewProduct,
   createBulkNewProduct,
   getProductById,
   deleteProductById,
-  updateProductById
-} = require('../controllers/productsController');
+  updateProductById,
+  sugestProducts,
+} = require("../controllers/productsController");
 
 const getProductsHandler = async (req, res) => {
-  const { name } = req.query;
+  const filterObject = req.query;
   try {
-    const results = name
-      ? await searchProductByName(name)
-      : await getAllProducts();
+    const results = await getAllProducts(filterObject);
     res.status(200).json(results);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -40,7 +38,7 @@ const createBulkProductHandler = async (req, res) => {
   try {
     const bulkData = req.body;
     const bulkNewProduct = createBulkNewProduct(bulkData);
-    res.status(200).json('Productos creados exitosamente')
+    res.status(200).json("Productos creados exitosamente");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -92,6 +90,15 @@ const updateProductHandler = async (req, res) => {
   }
 };
 
+const sugestProductHandler = async (req, res) => {
+  try {
+    const { name } = req.query;
+    const results = await sugestProducts(name);
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 module.exports = {
   getProductsHandler,
@@ -100,4 +107,5 @@ module.exports = {
   getProductByIdHandler,
   deleteProductHandler,
   updateProductHandler,
+  sugestProductHandler,
 };
