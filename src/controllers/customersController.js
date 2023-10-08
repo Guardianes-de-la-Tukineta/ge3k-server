@@ -129,6 +129,20 @@ const updateCustomerById = async (id, customerData) => {
   }
 };
 
+const getCustomerByEmail = async (email) => {
+  try {
+    const customer = await Customer.findOne({
+      where: {
+        email: email,
+      },
+    });
+    return customer;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 module.exports = {
   getAllCustomers,
   searchCustomerByName,
@@ -136,4 +150,5 @@ module.exports = {
   getCustomerById,
   deleteCustomerById,
   updateCustomerById,
+  getCustomerByEmail,
 };
