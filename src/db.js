@@ -49,6 +49,7 @@ const {
   Category,
   Theme,
   Cart,
+  Admin
 } = sequelize.models;
 
 // Aca vendrian las relaciones

@@ -3,6 +3,8 @@ const {
   searchThemeByName,
   createNewTheme,
   getThemeById,
+  updateThemeById,
+  deleteThemeById
 } = require("../controllers/themesController");
 
 const getThemesHandler = async (req, res) => {
@@ -46,8 +48,42 @@ const getThemeByIdHandler = async (req, res) => {
   }
 };
 
+
+const deleteThemeHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deleteThemeById(id);
+    res.status(200).json({ message: `Tema con eliminado` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const updateThemeHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const themeData = req.body;
+
+    const updatedtheme = await updateThemeById(id, themeData);
+
+    if (updatedTheme) {
+      res.status(200).json({
+        message: `Tema actualizado exitosamente`,
+      });
+    } else {
+      res.status(404).json({ message: "Tema no encontrado." });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getThemesHandler,
   createThemeHandler,
   getThemeByIdHandler,
+  deleteThemeHandler,
+  updateThemeHandler,
 };

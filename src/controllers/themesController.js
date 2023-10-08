@@ -36,10 +36,37 @@ const bulkCreateNewTheme = async (themes) => {
   await Theme.bulkCreate(themes);
 };
 
+const updateThemeById = async (id, themeData) => {
+    const { name} = themeData;
+
+    const theme = await Theme.findByPk(id);
+
+    if (!theme) {
+      return null; 
+    }
+    if (name) {
+      theme.name = name;
+    }
+    await theme.save();
+    return theme;
+};
+
+const deleteThemeById = async (id) => {
+
+    const theme = await Theme.findByPk(id);
+    if (!theme) {
+      throw new Error("themeo no encontrado");
+    }
+    await theme.destroy();
+};
+
+
 module.exports = {
   getAllThemes,
   searchThemeByName,
   getThemeById,
   createNewTheme,
   bulkCreateNewTheme,
+  updateThemeById,
+  deleteThemeById,
 };
