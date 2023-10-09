@@ -27,11 +27,46 @@ const getCart = async (CustomerId) => {
   return products;
 };
 
-const createNewCart = async (customerId, productId, quantity) => {
-  const newCart = await Cart.create({ quantity });
-  await newCart.setCustomer(customerId);
-  await newCart.setProduct(productId);
-  return newCart;
+const createNewCart = async (CustomerId, ProductId, quantity) => {
+  const [newCart, created] = await Cart.findOrCreate({
+    where: { CustomerId, ProductId },
+    defaults: { quantity },
+  });
+
+  if (!created) {
+    newCart.quantity = quantity;
+    await newCart.save();
+    return { message: "Cantidad actualizada" };
+  }
+  return { message: "Producto agregado al carrito" };
+};
+
+const createBulkCart = async (CustomerId, products) => {
+  if (products) {
+    const currentCart = await Cart.findAll({
+      where: { CustomerId },
+      attributes: ["id", "CustomerId", "ProductId"],
+    });
+
+    products.forEach((product) => {
+      product.CustomerId = CustomerId;
+      currentCart.forEach((cart) => {
+        if (
+          cart.ProductId === product.ProductId &&
+          cart.CustomerId === CustomerId
+        )
+          product.id = cart.id;
+      });
+    });
+
+    await Cart.bulkCreate(products, {
+      updateOnDuplicate: ["quantity"],
+    });
+  }
+
+  const cart = await getCart(CustomerId);
+
+  return cart;
 };
 
 const deleteCart = async (CustomerId, ProductId) => {
@@ -46,4 +81,10 @@ const deleteBulkCart = async (CustomerId) => {
   Cart.destroy({ where: { CustomerId } });
 };
 
-module.exports = { getCart, createNewCart, deleteCart, deleteBulkCart };
+module.exports = {
+  getCart,
+  createNewCart,
+  createBulkCart,
+  deleteCart,
+  deleteBulkCart,
+};
