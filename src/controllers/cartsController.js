@@ -50,12 +50,15 @@ const createBulkCart = async (CustomerId, products) => {
 
     products.forEach((product) => {
       product.CustomerId = CustomerId;
+      product.ProductId = product.productId;
+      delete product.productId;
       currentCart.forEach((cart) => {
         if (
           cart.ProductId === product.ProductId &&
-          cart.CustomerId === CustomerId
-        )
+          cart.CustomerId === product.CustomerId
+        ) {
           product.id = cart.id;
+        }
       });
     });
 
