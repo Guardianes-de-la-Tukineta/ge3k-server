@@ -24,7 +24,13 @@ const getCart = async (CustomerId) => {
     };
   });
 
-  return products;
+  const initial = 0;
+  const total = products.reduce(
+    (accumulator, product) => accumulator + Number(product.product.price)*product.quantity,
+    initial
+  );
+
+  return { products, total };
 };
 
 const createNewCart = async (CustomerId, ProductId, quantity) => {
