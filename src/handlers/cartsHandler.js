@@ -1,6 +1,7 @@
 const {
   getCart,
   createNewCart,
+  createBulkCart,
   deleteCart,
   deleteBulkCart,
 } = require("../controllers/cartsController");
@@ -19,10 +20,17 @@ const createCartHandler = async (req, res) => {
   try {
     const { customerId, productId, quantity } = req.body;
     const newCart = await createNewCart(customerId, productId, quantity);
-    res.status(200).json({
-      message: "Producto agregado al carrito exitosamente",
-      cartId: newCart.id,
-    });
+    res.status(200).json(newCart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const createBulkCartHandler = async (req, res) => {
+  try {
+    const { customerId, products } = req.body;
+    const newCart = await createBulkCart(customerId, products);
+    res.status(200).json(newCart);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -43,6 +51,7 @@ const deleteCartHandler = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: error.message });
   }
 };
@@ -51,4 +60,5 @@ module.exports = {
   getCartsHandler,
   createCartHandler,
   deleteCartHandler,
+  createBulkCartHandler,
 };
