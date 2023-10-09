@@ -6,6 +6,7 @@ const {
   deleteCustomerById,
   updateCustomerById,
   getCustomerByEmail,
+  updateCustomerByEmail,
 } = require('../controllers/customersController');
 
 const getCustomersHandler = async (req, res) => {
@@ -97,6 +98,27 @@ const getCustomerByEmailHandler = async (req, res) => {
   }
 };
 
+const updateCustomerByEmailHandler = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const updatedData = req.body;
+
+    const updatedCustomer = await updateCustomerByEmail(email, updatedData);
+
+    if (updatedCustomer) {
+      res.status(200).json({
+        message: `Cliente con correo electrónico ${email} actualizado exitosamente`,
+      });
+    } else {
+      res.status(404).json({ message: 'Cliente no encontrado.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 module.exports = {
   getCustomersHandler,
   createCustomerHandler,
@@ -104,4 +126,5 @@ module.exports = {
   deleteCustomerHandler,
   updateCustomerHandler,
   getCustomerByEmailHandler,
+  updateCustomerByEmailHandler,
 };
