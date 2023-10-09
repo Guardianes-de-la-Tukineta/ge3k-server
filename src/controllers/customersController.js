@@ -142,6 +142,57 @@ const getCustomerByEmail = async (email) => {
   }
 };
 
+const updateCustomerByEmail = async (email, updatedData) => {
+  try {
+    const customer = await Customer.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!customer) {
+      return null;
+    }
+
+    const {
+      name,
+      surname,
+      birthdate,
+      phone,
+      address,
+      paymentMethod,
+      category,
+    } = updatedData;
+
+    if (name) {
+      customer.name = name;
+    }
+    if (surname) {
+      customer.surname = surname;
+    }
+    if (birthdate) {
+      customer.birthdate = birthdate;
+    }
+    if (phone) {
+      customer.phone = phone;
+    }
+    if (address) {
+      customer.address = address;
+    }
+    if (paymentMethod) {
+      customer.paymentMethod = paymentMethod;
+    }
+    if (category !== undefined) {
+      customer.category = category;
+    }
+
+    await customer.save();
+
+    return customer;
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
   getAllCustomers,
@@ -151,4 +202,5 @@ module.exports = {
   deleteCustomerById,
   updateCustomerById,
   getCustomerByEmail,
+  updateCustomerByEmail,
 };
