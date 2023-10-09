@@ -50,7 +50,11 @@ const createBulkCart = async (CustomerId, products) => {
 
     products.forEach((product) => {
       product.CustomerId = CustomerId;
-      product.ProductId = product.productId;
+      if (product.productId && product.quantity) {
+        product.ProductId = product.productId;
+      } else {
+        throw Error('Deben existir las propiedades "productId" y "quantity"');
+      }
       delete product.productId;
       currentCart.forEach((cart) => {
         if (
