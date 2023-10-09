@@ -28,6 +28,35 @@ const createNewCategory = async (category) => {
   const newCategory = await Category.create({ name });
   return newCategory;
 };
+const updateCategoryById = async (id, categoryData) => {
+  const {name} = categoryData;
+
+  const category = await Category.findByPk(id);
+
+  if (!category) {
+    return null;
+  }
+  if (name) {
+    category.name = name;
+  }
+ 
+  await category.save();
+
+  return category;
+
+
+};
+const deleteCategoryById = async (id) => {
+    const category = await Category.findByPk(id);
+    if (!category) {
+      throw new Error("categoria no encontrada");
+    }
+    await category.destroy();
+    return { message: "categoria eliminada"
+  }
+};
+
+
 
 const bulkCreateNewCategory = async (categories) => {
   await Category.bulkCreate(categories);
@@ -38,5 +67,7 @@ module.exports = {
   searchCategoryByName,
   getCategoryById,
   createNewCategory,
+  updateCategoryById,
+  deleteCategoryById,
   bulkCreateNewCategory,
 };

@@ -118,7 +118,6 @@ const updateCustomerByEmailHandler = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getCustomersHandler,
   createCustomerHandler,

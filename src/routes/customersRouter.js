@@ -19,5 +19,4 @@ customersRouter.put('/:id', updateCustomerHandler);
 customersRouter.get('/email/:email', getCustomerByEmailHandler);
 customersRouter.put('/email/:email', updateCustomerByEmailHandler);
 
-
 module.exports = customersRouter;

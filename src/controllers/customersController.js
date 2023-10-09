@@ -194,8 +194,6 @@ const updateCustomerByEmail = async (email, updatedData) => {
   }
 };
 
-
-
 module.exports = {
   getAllCustomers,
   searchCustomerByName,
