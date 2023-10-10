@@ -1,8 +1,8 @@
-const { Product, Category, Theme } = require("../db");
-const { Op } = require("sequelize");
-const { bulkCreateNewTheme } = require("./themesController");
-const { bulkCreateNewCategory } = require("./categoriesController");
-const { productFormat } = require("../utils/utils");
+const { Product, Category, Theme } = require('../db');
+const { Op } = require('sequelize');
+const { bulkCreateNewTheme } = require('./themesController');
+const { bulkCreateNewCategory } = require('./categoriesController');
+const { productFormat } = require('../utils/utils');
 
 const getAllProducts = async (filterObject) => {
   const {
@@ -45,11 +45,11 @@ const getAllProducts = async (filterObject) => {
   let order = [];
 
   if (nameOrder) {
-    order = [...order, ["name", nameOrder]];
+    order = [...order, ['name', nameOrder]];
   }
 
   if (priceOrder) {
-    order = [...order, ["price", priceOrder]];
+    order = [...order, ['price', priceOrder]];
   }
 
   let limit, offset;
@@ -70,58 +70,54 @@ const getAllProducts = async (filterObject) => {
 };
 
 const createNewProduct = async (product) => {
-  try {
-    const {
-      name,
-      price,
-      image,
-      description,
-      stock,
-      discount,
-      categoryName,
-      themeName,
-    } = product;
+  const {
+    name,
+    price,
+    image,
+    description,
+    stock,
+    discount,
+    categoryName,
+    themeName,
+  } = product;
 
-    const newProduct = await Product.create({
-      name,
-      price,
-      image,
-      description,
-      stock,
-      discount,
-    });
+  const newProduct = await Product.create({
+    name,
+    price,
+    image,
+    description,
+    stock,
+    discount,
+  });
 
-    //* acá lo que intenté hacer es que se fije si existe o no ese ID de categoría, así determina si debe o no crear una categoría nueva
-    let category = null;
-    if (categoryName) {
-      category = await Category.findOne({ where: { name: categoryName } });
-      if (!category) {
-        category = await Category.create({ name: categoryName });
-      }
+  //* acá lo que intenté hacer es que se fije si existe o no ese ID de categoría, así determina si debe o no crear una categoría nueva
+  let category = null;
+  if (categoryName) {
+    category = await Category.findOne({ where: { name: categoryName } });
+    if (!category) {
+      category = await Category.create({ name: categoryName });
     }
-
-    //* IDEM a lo que intenté con categoría
-    let theme = null;
-    if (themeName) {
-      theme = await Theme.findOne({ where: { name: themeName } });
-      if (!theme) {
-        theme = await Theme.create({ name: themeName });
-      }
-    }
-
-    //* y acá es cuando asocio, al nuevo producto, con la categoría/temática correspondiente
-    if (category) {
-      await newProduct.setCategory(category.id);
-    }
-
-    if (theme) {
-      await newProduct.setTheme(theme.id);
-    }
-
-    return newProduct;
-  } catch (error) {
-    throw error;
   }
+
+  //* IDEM a lo que intenté con categoría
+  let theme = null;
+  if (themeName) {
+    theme = await Theme.findOne({ where: { name: themeName } });
+    if (!theme) {
+      theme = await Theme.create({ name: themeName });
+    }
+  }
+
+  //* y acá es cuando asocio, al nuevo producto, con la categoría/temática correspondiente
+  if (category) {
+    await newProduct.setCategory(category.id);
+  }
+
+  if (theme) {
+    await newProduct.setTheme(theme.id);
+  }
+
+  return newProduct;
 };
 
 const createBulkNewProduct = async (bulkData) => {
@@ -196,69 +192,57 @@ const createBulkNewProduct = async (bulkData) => {
 };
 
 const getProductById = async (id) => {
-  try {
-    const product = await Product.findByPk(id, {
-      include: [{ model: Category }, { model: Theme }],
-    });
-    return product ? productFormat(product) : null;
-  } catch (error) {
-    throw error;
-  }
+  const product = await Product.findByPk(id, {
+    include: [{ model: Category }, { model: Theme }],
+  });
+  return product ? productFormat(product) : null;
 };
 
 const deleteProductById = async (id) => {
-  try {
-    const product = await Product.findByPk(id);
-    if (!product) {
-      throw new Error("Producto no encontrado");
-    }
-    await product.destroy();
-  } catch (error) {
-    throw error;
+  const product = await Product.findByPk(id);
+  if (!product) {
+    throw new Error('Producto no encontrado');
   }
+  await product.destroy();
 };
 
 const updateProductById = async (id, productData) => {
-  try {
-    const { name, price, image, description, stock, discount } = productData;
+  const { name, price, image, description, stock, discount } = productData;
 
-    const product = await Product.findByPk(id);
+  const product = await Product.findByPk(id);
 
-    if (!product) {
-      return null; //* Esto es por si no puede encotnrar el producto
-    }
-
-    //* Acá lo que hago es que actualice ÚNICAMENTE los campos que le paso
-    if (name) {
-      product.name = name;
-    }
-    if (price) {
-      product.price = price;
-    }
-    if (image) {
-      product.image = image;
-    }
-    if (description) {
-      product.description = description;
-    }
-    if (stock) {
-      product.stock = stock;
-    }
-    if (discount !== undefined) {
-      product.discount = discount;
-    }
-
-    await product.save();
-
-    return product;
-  } catch (error) {
-    throw error;
+  if (!product) {
+    return null; //* Esto es por si no puede encotnrar el producto
   }
+
+  //* Acá lo que hago es que actualice ÚNICAMENTE los campos que le paso
+  if (name) {
+    product.name = name;
+  }
+  if (price) {
+    product.price = price;
+  }
+  if (image) {
+    product.image = image;
+  }
+  if (description) {
+    product.description = description;
+  }
+  if (stock) {
+    product.stock = stock;
+  }
+  if (discount !== undefined) {
+    product.discount = discount;
+  }
+
+  await product.save();
+
+  return product;
 };
 
 const sugestProducts = async (sugest) => {
   const products = await Product.findAll({
-    attributes: ["name"],
+    attributes: ['name'],
     where: { name: { [Op.iLike]: `%${sugest}%` } },
     limit: 5,
   });
