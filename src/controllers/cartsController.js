@@ -1,4 +1,5 @@
 const { Cart, Product, Category, Theme } = require("../db");
+const { Op } = require("sequelize");
 const { productFormat } = require("../utils/utils");
 
 const getCart = async (CustomerId) => {
@@ -26,7 +27,8 @@ const getCart = async (CustomerId) => {
 
   const initial = 0;
   const total = products.reduce(
-    (accumulator, product) => accumulator + Number(product.product.price)*product.quantity,
+    (accumulator, product) =>
+      accumulator + Number(product.product.price) * product.quantity,
     initial
   );
 
@@ -34,17 +36,23 @@ const getCart = async (CustomerId) => {
 };
 
 const createNewCart = async (CustomerId, ProductId, quantity) => {
-  const [newCart, created] = await Cart.findOrCreate({
-    where: { CustomerId, ProductId },
-    defaults: { quantity },
-  });
+  const stock = (await Product.findOne({ where: { id: ProductId } })).stock;
 
-  if (!created) {
-    newCart.quantity = quantity;
-    await newCart.save();
-    return { message: "Cantidad actualizada" };
+  if (stock >= quantity) {
+    const [newCart, created] = await Cart.findOrCreate({
+      where: { CustomerId, ProductId },
+      defaults: { quantity },
+    });
+
+    if (!created) {
+      newCart.quantity = quantity;
+      await newCart.save();
+      return { message: "Cantidad actualizada" };
+    }
+    return { message: "Producto agregado al carrito" };
+  } else {
+    throw Error("Stock insuficiente");
   }
-  return { message: "Producto agregado al carrito" };
 };
 
 const createBulkCart = async (CustomerId, products) => {
@@ -70,6 +78,21 @@ const createBulkCart = async (CustomerId, products) => {
           product.id = cart.id;
         }
       });
+    });
+
+    const productsId = products.map((product) => product.ProductId);
+
+    const inStock = await Product.findAll({
+      where: { id: { [Op.or]: productsId } },
+      attributes: ["id", "name", "stock"],
+    });
+
+    products.forEach((product) => {
+      const prodInStock = inStock.find((prod) => prod.id === product.ProductId);
+      if (product.quantity > prodInStock.stock) {
+        product.quantity = prodInStock.stock;
+        // throw Error(`Stock insuficiente del producto ${prodInStock.name}. Máximo disponible ${prodInStock.stock}`);
+      }
     });
 
     await Cart.bulkCreate(products, {
