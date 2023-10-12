@@ -5,11 +5,11 @@ const {
     //getAdminByIdHandler, 
     //deleteAdminHandler, 
     //updateAdminHandler
-} = require('../handlers/adminsHandler');
+} = require('../handlers/adminHandler');
 
 const adminsRouter = Router();
 
-adminsRouter.get('/Login', getAdminsHandler);
+adminsRouter.get('/Login', getAdminByEmailHandler);
 
 
 module.exports = adminsRouter;
