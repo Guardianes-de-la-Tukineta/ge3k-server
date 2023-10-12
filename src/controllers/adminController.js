@@ -1,28 +1,70 @@
 const {Admin} = require('../db');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-const loginAdmin = async (req, res) => {
-    const { email, password } = req.body;
+const loginAdmin = async (email,password) => {
+    const admin = await Admin.findOne({ where: { email } });
+    if (!admin) {
+      throw new Error('El email no existe');
 
-        // Busca el usuario en la base de datos
-        const admin = await Admin.findOne({ email });
+    } else {
+      const isValid = await bcrypt.compare(password, admin.password);
+      if (!isValid) {
+        throw new Error('Contraseña incorrecta');
+      }
+      const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET, {
+        expiresIn: '1d',
+      });
+      return { token };
 
-        // Verifica si el admin existe
-        if (!admin) {
-            return res.status(401).json({ message: 'Credenciales inválidas' });
-        }
-        else {
-            // Verifica si el password es correcto
-            const passwordMatches = await bcrypt.compare(password, admin.password);
-            if (!passwordMatches) {
-                return res.status(401).json({ message: 'Credenciales inválidas' });
-            }
-            else {
-                return res.status(200).json({ message: 'Bienvenido' });
-            }
-        }
 
+   
+    };
+  };
+        const getAllAdmins = async () => {
+     
+              const admins = await Admin.findAll();
+              return admins;
+           
+          };
     
-};
+    
+          const searchAdminByName = async (adminName) => {
+      
+              const results = await Admin.findAll({
+                where: {
+                  name: {
+                    [Op.iLike]: `%${adminName}%`, //* Búsqueda inexacta (y tampoco distingue mayúsculas/minúsculas)
+                  },
+                },
+              });
+              return results;
+        
+          };
+          
+const createNewAdmin = async (admin) => {  
+    const {
+        name,
+        surname,
+        email,
+        password,
+      } = admin;
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const newAdmin = await Admin.create({
+        name,
+        surname,
+        email,
+        password: hashedPassword,
+      });
+
+      return newAdmin;
+    }
+
 module.exports = {
-    loginAdmin
+    loginAdmin,
+    getAllAdmins,
+    searchAdminByName,
+    createNewAdmin
 }
