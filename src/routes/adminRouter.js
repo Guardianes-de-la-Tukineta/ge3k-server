@@ -15,5 +15,4 @@ adminRouter.get('email/:email', getAdminByEmailHandler);
 adminRouter.get('/', getAdminHandler);
 adminRouter.post('/', createNewAdminHandler);
 
-
 module.exports = adminRouter;

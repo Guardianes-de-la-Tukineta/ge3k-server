@@ -3,6 +3,7 @@ const {
   createOrderController,
   getOrdersByCustomerIdController,
   getOrderDetailByOrderIdController,
+  deleteOrderById,
 } = require('../controllers/ordersControllers');
 
 const getOrdersHandler = async (req, res) => {
@@ -44,9 +45,22 @@ const getOrderDetailByOrderIdHandler = async (req, res) => {
   }
 };
 
+const deleteOrderHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deleteOrderById(id);
+    res
+      .status(200)
+      .json({ message: `Orden con id ${id} eliminada exitosamente` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getOrdersHandler,
   createOrdersHandler,
   getOrdersByCustomerIdHandler,
   getOrderDetailByOrderIdHandler,
+  deleteOrderHandler,
 };

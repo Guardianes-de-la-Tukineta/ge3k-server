@@ -52,9 +52,21 @@ const getOrderDetailByOrderIdController = async (orderId) => {
   return orderDetail;
 };
 
+//* Se elimina una Orden mediante su ID
+const deleteOrderById = async (orderId) => {
+  const orderToDelete = await Order.findByPk(orderId);
+
+  if (!orderToDelete) {
+    throw new Error('Orden no encontrada');
+  }
+
+  await orderToDelete.destroy();
+};
+
 module.exports = {
   getAllOrders,
   createOrderController,
   getOrdersByCustomerIdController,
   getOrderDetailByOrderIdController,
+  deleteOrderById,
 };
