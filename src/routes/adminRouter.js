@@ -1,15 +1,18 @@
 const {Router} = require('express');
 const {
     getAdminByEmailHandler, 
-    //createAdminHandler, 
+    getAdminHandler,
+    createNewAdminHandler,
+    getLoginAccess,
     //getAdminByIdHandler, 
     //deleteAdminHandler, 
     //updateAdminHandler
 } = require('../handlers/adminHandler');
 
-const adminsRouter = Router();
+const adminRouter = Router();
+adminRouter.post('/login', getLoginAccess);
+adminRouter.get('email/:email', getAdminByEmailHandler);
+adminRouter.get('/', getAdminHandler);
+adminRouter.post('/', createNewAdminHandler);
 
-adminsRouter.get('/Login', getAdminByEmailHandler);
-
-
-module.exports = adminsRouter;
+module.exports = adminRouter;
