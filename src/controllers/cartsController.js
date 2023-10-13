@@ -26,11 +26,16 @@ const getCart = async (CustomerId) => {
   });
 
   const initial = 0;
-  const total = products.reduce(
+  let total = products.reduce(
     (accumulator, product) =>
-      accumulator + Number(product.product.price) * product.quantity,
+      accumulator +
+      Number(product.product.price) *
+        product.quantity *
+        (product.product.discount ? 1 - product.product.discount / 100 : 1),
     initial
   );
+
+  total = Number(total.toFixed(2));
 
   return { products, total };
 };
@@ -51,7 +56,7 @@ const createNewCart = async (CustomerId, ProductId, quantity) => {
     }
     return { message: "Producto agregado al carrito" };
   } else {
-    throw Error("Stock insuficiente");
+    throw Error(`Stock insuficiente. Máximo disponible ${stock} unidades.`);
   }
 };
 
