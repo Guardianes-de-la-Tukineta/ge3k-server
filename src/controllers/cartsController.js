@@ -51,7 +51,7 @@ const createNewCart = async (CustomerId, ProductId, quantity) => {
     }
     return { message: "Producto agregado al carrito" };
   } else {
-    throw Error("Stock insuficiente");
+    throw Error(`Stock insuficiente. Máximo disponible ${stock} unidades.`);
   }
 };
 
