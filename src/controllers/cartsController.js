@@ -29,9 +29,12 @@ const getCart = async (CustomerId) => {
   let total = products.reduce(
     (accumulator, product) =>
       accumulator +
-      Number(product.product.price) *
-        product.quantity *
-        (product.product.discount ? 1 - product.product.discount / 100 : 1),
+      (Math.round(
+        product.product.price *
+          (product.product.discount ? 100 - product.product.discount : 100)
+      ) *
+        product.quantity) /
+        100,
     initial
   );
 

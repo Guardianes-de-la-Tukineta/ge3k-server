@@ -7,6 +7,7 @@ const themesRouter = require('./themesRouter');
 const cartsRouter = require('./cartsRouter');
 const ordersRouter = require('./ordersRouter');
 const adminRouter = require('./adminRouter');
+const stripeRouter = require('./stripeRouter')
 
 const router = Router();
 
@@ -18,7 +19,7 @@ router.use('/themes', themesRouter);
 router.use('/carts', cartsRouter);
 router.use('/orders', ordersRouter);
 router.use('/admin', adminRouter);
-
+router.use("/stripe-session", stripeRouter);
 
 
 module.exports = router;
