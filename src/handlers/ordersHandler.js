@@ -4,7 +4,7 @@ const {
   getOrdersByCustomerIdController,
   getOrderDetailByOrderIdController,
   deleteOrderById,
-} = require('../controllers/ordersControllers');
+} = require("../controllers/ordersControllers");
 
 const getOrdersHandler = async (req, res) => {
   try {
