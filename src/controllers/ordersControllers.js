@@ -1,4 +1,5 @@
-const { Order, OrderDetail } = require("../db");
+const { Order, OrderDetail, Product } = require("../db");
+const { Op } = require("sequelize");
 const { getCustomerByEmail } = require("../controllers/customersController");
 const { getCart, deleteBulkCart } = require("../controllers/cartsController");
 const Stripe = require("stripe");
@@ -12,36 +13,76 @@ const getAllOrders = async () => {
   return orders;
 };
 
-const createOrderController = async (customerInfo) => {
-  //Verifico que la orden de stripe esté paga:
-  const { payment_status } = await stripe.checkout.sessions.retrieve(
-    customerInfo.stripeOrderId
-  );
+const createOrderController = async (
+  CustomerId,
+  name,
+  surname,
+  birthdate,
+  email,
+  phone,
+  address,
+  status
+) => {
+  if (
+    !CustomerId ||
+    !name ||
+    !surname ||
+    !birthdate ||
+    !email ||
+    !phone ||
+    !address ||
+    !status
+  )
+    throw Error("Check information");
 
-  if (payment_status !== "paid") {
-    throw Error("Payment error");
-  }
-
-  //* Se recibe un objeto con la información del customer {name:..., surname:..., mail:..., address:..., etc}
-  let customer, newOrder;
-  if (customerInfo.email) {
-    //* Se obtiene la información del customer con a través del mail.
-    customer = await getCustomerByEmail(customerInfo.email);
-    if (customer) {
-      //* Se crea una nueva order con la información del cliente y el customerId obtenido.
-      newOrder = await Order.create({
-        ...customerInfo,
-        CustomerId: customer.id,
-      });
-    } else {
-      throw Error("Customer not found");
-    }
-  } else {
-    throw Error("Customer does not have email property");
-  }
+  const newOrder = await Order.create({
+    CustomerId,
+    name,
+    surname,
+    birthdate,
+    email,
+    phone,
+    address,
+    status,
+  });
 
   //* Se obtiene la información de carrito con la consulta por customerId
-  const cart = await getCart(customer.id);
+  const cart = await getCart(CustomerId);
+
+  //Verify stock
+  const productsId = cart.products.map((product) => product.product.id);
+  const inStock = await Product.findAll({
+    where: { id: { [Op.or]: productsId } },
+    attributes: ["id", "name", "stock"],
+  });
+
+  let message = [],
+    noStock = false;
+  cart.products.forEach((product) => {
+    const stock = inStock.find((prod) => prod.id === product.product.id).stock;
+    if (product.quantity > stock) {
+      message.push(`${product.product.name} máximo disponible ${stock}`);
+      noStock = true;
+    }
+  });
+  if (noStock) {
+    throw Error(message);
+  }
+
+  //Stock discount
+  inStock.map((product) => {
+    const discount = cart.products.find(
+      (prod) => prod.product.id === product.id
+    ).quantity;
+    product.stock = product.stock - discount;
+  });
+
+  const updatePromises = inStock.map((product) => product.save());
+  Promise.all(updatePromises)
+    .then((res) => res)
+    .catch((err) => {
+      throw Error(err);
+    });
 
   //* Ahora se procesa el array de productos para crear el orderDetail
   const NewOrderDetail = cart.products.map((item) => {
@@ -56,10 +97,26 @@ const createOrderController = async (customerInfo) => {
   await OrderDetail.bulkCreate(NewOrderDetail);
 
   //* Vaciamos el carrito del usuario
-  await deleteBulkCart(customer.id);
+  await deleteBulkCart(CustomerId);
 
   //* Se retorna la información de la nueva order
-  return { newOrder };
+  return newOrder;
+};
+
+const updateOrderController = async (stripeOrderId) => {
+  //Verifico que la orden de stripe esté paga:
+  const { payment_status } = await stripe.checkout.sessions.retrieve(
+    stripeOrderId
+  );
+
+  if (payment_status !== "paid") {
+    throw Error("Payment error");
+  }
+
+  const order = await Order.findOne({ where: { stripeOrderId } });
+  order.status = "Approved";
+  order.save();
+  return { message: order.status };
 };
 
 //* Se obtienen todas las orders (mediante el customerId)
@@ -90,6 +147,7 @@ const deleteOrderById = async (orderId) => {
 module.exports = {
   getAllOrders,
   createOrderController,
+  updateOrderController,
   getOrdersByCustomerIdController,
   getOrderDetailByOrderIdController,
   deleteOrderById,
