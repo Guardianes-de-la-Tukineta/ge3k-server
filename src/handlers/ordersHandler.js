@@ -1,6 +1,7 @@
 const {
   getAllOrders,
   createOrderController,
+  updateOrderController,
   getOrdersByCustomerIdController,
   getOrderDetailByOrderIdController,
   deleteOrderById,
@@ -20,6 +21,16 @@ const createOrdersHandler = async (req, res) => {
     const customer = req.body;
     const orderDetail = await createOrderController(customer);
     res.status(200).json(orderDetail);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const updateOrderHandler = async (req, res) => {
+  const { stripeOrderId } = req.body;
+  try {
+    const updateOrder = await updateOrderController(stripeOrderId);
+    res.status(200).json(updateOrder);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -60,6 +71,7 @@ const deleteOrderHandler = async (req, res) => {
 module.exports = {
   getOrdersHandler,
   createOrdersHandler,
+  updateOrderHandler,
   getOrdersByCustomerIdHandler,
   getOrderDetailByOrderIdHandler,
   deleteOrderHandler,
