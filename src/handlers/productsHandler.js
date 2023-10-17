@@ -5,6 +5,7 @@ const {
   getProductById,
   deleteProductById,
   updateProductById,
+  restoreProductById,
   sugestProducts,
 } = require("../controllers/productsController");
 
@@ -89,6 +90,16 @@ const updateProductHandler = async (req, res) => {
   }
 };
 
+const restoreProductHandler = async (req, res) => {
+  try {
+    const { productId } = req.query;
+    const product = await restoreProductById(productId);
+    res.status(200).json({ message: `Producto ${product.name} restaurado` });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const sugestProductHandler = async (req, res) => {
   try {
     const { name } = req.query;
@@ -106,5 +117,6 @@ module.exports = {
   getProductByIdHandler,
   deleteProductHandler,
   updateProductHandler,
+  restoreProductHandler,
   sugestProductHandler,
 };
