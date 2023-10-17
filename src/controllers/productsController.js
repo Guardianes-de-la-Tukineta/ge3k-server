@@ -13,6 +13,7 @@ const getAllProducts = async (filterObject) => {
     pageNumber,
     unitsPerPage,
     name,
+    type,
   } = filterObject;
 
   let where = {};
@@ -52,10 +53,16 @@ const getAllProducts = async (filterObject) => {
     order = [...order, ["price", priceOrder]];
   }
 
+  let paranoid = true;
+  if (type === "hard") {
+    paranoid = false;
+  }
+
   const specs = {
     include: [{ model: Category }, { model: Theme }],
     order,
     where,
+    paranoid,
   };
 
   let products = await Product.findAll(specs);
@@ -251,6 +258,15 @@ const updateProductById = async (id, productData) => {
   return product;
 };
 
+const restoreProductById = async (productId) => {
+  const product = await Product.findByPk(productId, { paranoid: false });
+  if (!product) {
+    throw new Error("Producto no encontrado");
+  }
+  product.restore();
+  return product;
+};
+
 const sugestProducts = async (sugest) => {
   const products = await Product.findAll({
     attributes: ["name"],
@@ -267,5 +283,6 @@ module.exports = {
   getProductById,
   deleteProductById,
   updateProductById,
+  restoreProductById,
   sugestProducts,
 };
