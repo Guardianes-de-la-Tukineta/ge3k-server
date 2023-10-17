@@ -1,4 +1,10 @@
-const { loginAdmin, getAllAdmins,searchAdminByName , createNewAdmin} = require('../controllers/adminController');
+const { 
+  loginAdmin, 
+  getAllAdmins,
+  searchAdminByName , 
+  getAdminByEmail,
+  createNewAdmin
+} = require('../controllers/adminController');
 
 
 
@@ -14,20 +20,6 @@ const { loginAdmin, getAllAdmins,searchAdminByName , createNewAdmin} = require('
     }
   }
 
-
-const getAdminByEmailHandler = async (req, res) => {
-    try {
-      const { email } = req.params;
-  
-      const adminByEmail = await loginAdmin(email);
-  
-      return adminByEmail
-        ? res.status(200).json(adminByEmail)
-        : res.status(404).json({ message: 'Admin no encontrado.' });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
   const getAdminHandler = async (req, res) => {
     const { name } = req.query;
     try {
@@ -51,6 +43,22 @@ const getAdminByEmailHandler = async (req, res) => {
       res.status(400).json({ error: error.message });
     }
   }
+  const getAdminByEmailHandler = async (req, res) => {
+    try {
+      const { email } = req.params;
+  
+      const adminByEmail = await getAdminByEmail(email);
+  
+      return adminByEmail
+        ? res.status(200).json(adminByEmail)
+        : res.status(404).json({ message: 'Admin no encontrado.' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+
+
   const createNewAdminHandler = async (req, res) => {
     try {
       const newAdmin = await createNewAdmin(req.body);
