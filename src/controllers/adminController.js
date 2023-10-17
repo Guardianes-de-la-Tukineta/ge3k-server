@@ -72,11 +72,50 @@ const createNewAdmin = async (admin) => {
 
       return newAdmin;
     }
+    const updateAdminById = async (id, adminData) => {
+
+      const {
+        name,
+        surname,
+        email,
+        password,
+      } = adminData;
+      const admin = await Admin.findByPk(id);
+      if (!admin) {
+        throw new Error('Admin no encontrado');
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await admin.update({
+        name,
+        surname,
+        email,
+        password: hashedPassword,
+      });
+    }
+    const deleteAdminById = async (id) => {
+      const admin = await Admin.findByPk(id);
+      if (!admin) {
+        throw new Error('Admin no encontrado');
+      }
+      await admin.destroy();
+    }
+
+const restoreAdminById = async (id) => {
+  const admin = await Admin.findByPk(id, { paranoid: false });
+  if (!admin) {
+    throw new Error('Admin no encontrado');
+  }
+  await admin.restore();
+} 
+
 
 module.exports = {
     loginAdmin,
     getAllAdmins,
     searchAdminByName,
     getAdminByEmail,
-    createNewAdmin
+    createNewAdmin,
+    updateAdminById,
+    deleteAdminById,
+    restoreAdminById,
 }

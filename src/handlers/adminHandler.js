@@ -3,7 +3,10 @@ const {
   getAllAdmins,
   searchAdminByName , 
   getAdminByEmail,
-  createNewAdmin
+  createNewAdmin,
+  updateAdminById,
+  deleteAdminById,
+  restoreAdminById,
 } = require('../controllers/adminController');
 
 
@@ -62,16 +65,48 @@ const {
   const createNewAdminHandler = async (req, res) => {
     try {
       const newAdmin = await createNewAdmin(req.body);
-      res.status(201).json(newAdmin);
+      res.status(201).json({newAdmin, message: 'Admin creado exitosamente'});
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   }
+  const updateAdminByIdHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const adminData = req.body;
+      await updateAdminById(id, adminData);
+      res.status(204).json({message: 'Admin modificado exitosamente'});
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+  const deleteAdminByIdHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      await deleteAdminById(id);
+      res.status(204).json({message: 'Admin eliminado exitosamente'});
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+  const restoreAdminByIdHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      await restoreAdminById(id);
+      res.status(204).json({message: 'Admin restaurado exitosamente'});
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
 
 module.exports = {
     getAdminHandler,
     getAdminByEmailHandler,
     searchAdminByNameHandler,
     createNewAdminHandler,
-    getLoginAccess
+    getLoginAccess,
+    updateAdminByIdHandler,
+    deleteAdminByIdHandler,
+    restoreAdminByIdHandler,
 };
