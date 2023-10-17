@@ -122,7 +122,10 @@ const deleteCart = async (CustomerId, ProductId) => {
     where: { CustomerId, ProductId },
   });
   await delCart.destroy();
-  return delCart;
+
+  const total = (await getCart(CustomerId)).total;
+
+  return { total };
 };
 
 const deleteBulkCart = async (CustomerId) => {

@@ -45,10 +45,7 @@ const deleteCartHandler = async (req, res) => {
       res.status(200).json({ message: "Carrito vaciado exitosamente" });
     } else {
       const deletedCart = await deleteCart(customerId, productId);
-      res.status(200).json({
-        message: "Producto eliminado del carrito",
-        productId: deletedCart.id,
-      });
+      res.status(200).json(deletedCart);
     }
   } catch (error) {
     console.log(error);
