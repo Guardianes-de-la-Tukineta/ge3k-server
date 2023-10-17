@@ -1,6 +1,8 @@
 const {Admin} = require('../db');
 const bcrypt = require('bcrypt');
+const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 
 const loginAdmin = async (email,password) => {
     const admin = await Admin.findOne({ where: { email } });
@@ -15,7 +17,8 @@ const loginAdmin = async (email,password) => {
       const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET, {
         expiresIn: '1d',
       });
-      return { token };
+      
+      return { token, adminId: admin.id };
 
 
    
@@ -40,6 +43,14 @@ const loginAdmin = async (email,password) => {
               });
               return results;
         
+          };
+const getAdminByEmail = async (email) => {
+            const admin = await Admin.findOne({ 
+              where: { 
+                email:{
+              [Op.iLike]: `%${email}%`, //* Búsqueda inexacta (y tampoco distingue mayúsculas/minúsculas) 
+            } } });
+            return admin;
           };
           
 const createNewAdmin = async (admin) => {  
@@ -66,5 +77,6 @@ module.exports = {
     loginAdmin,
     getAllAdmins,
     searchAdminByName,
+    getAdminByEmail,
     createNewAdmin
 }
