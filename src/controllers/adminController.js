@@ -2,7 +2,7 @@ const {Admin} = require('../db');
 const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+const env = require('dotenv');
 
 const loginAdmin = async (email,password) => {
     const admin = await Admin.findOne({ where: { email } });
@@ -26,7 +26,7 @@ const loginAdmin = async (email,password) => {
   };
         const getAllAdmins = async () => {
      
-              const admins = await Admin.findAll();
+              const admins = await Admin.findAll({paranoid: false});
               return admins;
            
           };
