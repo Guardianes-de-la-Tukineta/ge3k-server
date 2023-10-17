@@ -55,15 +55,19 @@ const createNewCart = async (CustomerId, ProductId, quantity) => {
     if (!created) {
       newCart.quantity = quantity;
       await newCart.save();
-      return { message: "Cantidad actualizada" };
     }
-    return { message: "Producto agregado al carrito" };
+
+    const total = (await getCart(CustomerId)).total;
+
+    return { total };
   } else {
     throw Error(`Stock insuficiente. Máximo disponible ${stock} unidades.`);
   }
 };
 
 const createBulkCart = async (CustomerId, products) => {
+  let message = "Productos y cantidades actualizados";
+
   if (products) {
     const currentCart = await Cart.findAll({
       where: { CustomerId },
@@ -99,7 +103,7 @@ const createBulkCart = async (CustomerId, products) => {
       const prodInStock = inStock.find((prod) => prod.id === product.ProductId);
       if (product.quantity > prodInStock.stock) {
         product.quantity = prodInStock.stock;
-        // throw Error(`Stock insuficiente del producto ${prodInStock.name}. Máximo disponible ${prodInStock.stock}`);
+        message = "Cantidades actualizadas a stock disponible";
       }
     });
 
@@ -110,7 +114,7 @@ const createBulkCart = async (CustomerId, products) => {
 
   const cart = await getCart(CustomerId);
 
-  return cart;
+  return { message, cart };
 };
 
 const deleteCart = async (CustomerId, ProductId) => {

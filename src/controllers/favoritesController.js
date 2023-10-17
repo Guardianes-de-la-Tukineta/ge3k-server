@@ -16,6 +16,32 @@ const createNewFavorite = async (customerId, productId) => {
   return newFavorite;
 };
 
+const createBulkFavorite = async (CustomerId, products) => {
+  if (products) {
+    const currentFavorite = await Favorite.findAll({
+      where: { CustomerId },
+      attributes: ["id", "CustomerId", "ProductId"],
+    });
+
+    products.forEach((product) => {
+      currentFavorite.forEach((prod) => {
+        if (product.productId === prod.ProductId) {
+          product.id = prod.id;
+        }
+      });
+      product.CustomerId = CustomerId;
+      product.ProductId = product.productId;
+      delete product.productId;
+    });
+
+    await Favorite.bulkCreate(products, { ignoreDuplicates: true });
+  }
+
+  const favorite = await getAllFavorites(CustomerId);
+
+  return favorite;
+};
+
 const deleteFavorite = async (customerId, productId) => {
   const delFavorite = await Favorite.findOne({
     where: { CustomerId: customerId, ProductId: productId },
@@ -24,4 +50,9 @@ const deleteFavorite = async (customerId, productId) => {
   return delFavorite;
 };
 
-module.exports = { getAllFavorites, createNewFavorite, deleteFavorite };
+module.exports = {
+  getAllFavorites,
+  createNewFavorite,
+  createBulkFavorite,
+  deleteFavorite,
+};

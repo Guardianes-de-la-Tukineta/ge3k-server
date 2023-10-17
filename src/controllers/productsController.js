@@ -1,8 +1,8 @@
-const { Product, Category, Theme } = require('../db');
-const { Op } = require('sequelize');
-const { bulkCreateNewTheme } = require('./themesController');
-const { bulkCreateNewCategory } = require('./categoriesController');
-const { productFormat } = require('../utils/utils');
+const { Product, Category, Theme, OrderDetail } = require("../db");
+const { Op } = require("sequelize");
+const { bulkCreateNewTheme } = require("./themesController");
+const { bulkCreateNewCategory } = require("./categoriesController");
+const { productFormat } = require("../utils/utils");
 
 const getAllProducts = async (filterObject) => {
   const {
@@ -45,27 +45,32 @@ const getAllProducts = async (filterObject) => {
   let order = [];
 
   if (nameOrder) {
-    order = [...order, ['name', nameOrder]];
+    order = [...order, ["name", nameOrder]];
   }
 
   if (priceOrder) {
-    order = [...order, ['price', priceOrder]];
+    order = [...order, ["price", priceOrder]];
   }
-
-  let limit, offset;
-  if (unitsPerPage) limit = unitsPerPage;
-  if (pageNumber) offset = unitsPerPage * (pageNumber - 1);
 
   const specs = {
     include: [{ model: Category }, { model: Theme }],
     order,
     where,
-    limit,
-    offset,
   };
 
-  products = await Product.findAll(specs);
+  let products = await Product.findAll(specs);
 
+  if (pageNumber && unitsPerPage) {
+    const totalPages = Math.ceil(products.length / unitsPerPage);
+    products = products.slice(
+      (pageNumber - 1) * unitsPerPage,
+      pageNumber * unitsPerPage
+    );
+    return {
+      totalPages,
+      products: products.map((product) => productFormat(product)),
+    };
+  }
   return products.map((product) => productFormat(product));
 };
 
@@ -198,12 +203,18 @@ const getProductById = async (id) => {
   return product ? productFormat(product) : null;
 };
 
-const deleteProductById = async (id) => {
+const deleteProductById = async (id, type) => {
   const product = await Product.findByPk(id);
   if (!product) {
-    throw new Error('Producto no encontrado');
+    throw new Error("Producto no encontrado");
   }
-  await product.destroy();
+  let force = false;
+  if (type === "hard") {
+    const bought = await OrderDetail.findOne({ where: { ProductId: id } });
+    if (!bought) force = true;
+  }
+  await product.destroy({ force });
+  return product;
 };
 
 const updateProductById = async (id, productData) => {
@@ -242,7 +253,7 @@ const updateProductById = async (id, productData) => {
 
 const sugestProducts = async (sugest) => {
   const products = await Product.findAll({
-    attributes: ['name'],
+    attributes: ["name"],
     where: { name: { [Op.iLike]: `%${sugest}%` } },
     limit: 5,
   });

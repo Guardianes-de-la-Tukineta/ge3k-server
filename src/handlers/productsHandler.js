@@ -61,11 +61,10 @@ const getProductByIdHandler = async (req, res) => {
 
 const deleteProductHandler = async (req, res) => {
   try {
-    const { id } = req.params;
-    await deleteProductById(id);
-    res.status(200).json({ message: `Producto con id ${id} eliminado` });
+    const { productId, type } = req.query;
+    const product = await deleteProductById(productId, type);
+    res.status(200).json({ message: `Producto ${product.name} eliminado` });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };

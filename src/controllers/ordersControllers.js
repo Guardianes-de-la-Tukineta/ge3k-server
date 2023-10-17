@@ -23,29 +23,14 @@ const createOrderController = async (
   address,
   status
 ) => {
-  if (
-    !CustomerId ||
-    !name ||
-    !surname ||
-    !birthdate ||
-    !email ||
-    !phone ||
-    !address ||
-    !status
-  )
-    throw Error("Check information");
-
-  const newOrder = await Order.create({
-    CustomerId,
-    name,
-    surname,
-    birthdate,
-    email,
-    phone,
-    address,
-    status,
-  });
-
+  if (!name) {throw Error("Check name")}
+  if (!surname) {throw Error("Check surname")}
+  if (!birthdate) {throw Error("Check birthdate")}
+  if (!email) {throw Error("Check email")}
+  if (!phone) {throw Error("Check phone")}
+  if (!address) {throw Error("Check address")}
+  if (!status) {throw Error("Check status")}
+    
   //* Se obtiene la información de carrito con la consulta por customerId
   const cart = await getCart(CustomerId);
 
@@ -61,7 +46,7 @@ const createOrderController = async (
   cart.products.forEach((product) => {
     const stock = inStock.find((prod) => prod.id === product.product.id).stock;
     if (product.quantity > stock) {
-      message.push(`${product.product.name} máximo disponible ${stock}`);
+      message.push(`${product.product.name} máximo disponible ${stock} unidades`);
       noStock = true;
     }
   });
@@ -83,6 +68,17 @@ const createOrderController = async (
     .catch((err) => {
       throw Error(err);
     });
+
+  const newOrder = await Order.create({
+    CustomerId,
+    name,
+    surname,
+    birthdate,
+    email,
+    phone,
+    address,
+    status,
+  });
 
   //* Ahora se procesa el array de productos para crear el orderDetail
   const NewOrderDetail = cart.products.map((item) => {

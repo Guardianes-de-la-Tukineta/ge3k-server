@@ -1,6 +1,7 @@
 const {
   getAllFavorites,
   createNewFavorite,
+  createBulkFavorite,
   deleteFavorite,
 } = require("../controllers/favoritesController");
 
@@ -27,6 +28,16 @@ const createFavoriteHandler = async (req, res) => {
   }
 };
 
+const createBulkFavoriteHandler = async (req, res) => {
+  try {
+    const { customerId, products } = req.body;
+    const newFavorite = await createBulkFavorite(customerId, products);
+    res.status(200).json(newFavorite);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const deleteFavoriteHandler = async (req, res) => {
   const { customerId, productId } = req.body;
   try {
@@ -40,5 +51,6 @@ const deleteFavoriteHandler = async (req, res) => {
 module.exports = {
   getFavoritesHandler,
   createFavoriteHandler,
+  createBulkFavoriteHandler,
   deleteFavoriteHandler,
 };
