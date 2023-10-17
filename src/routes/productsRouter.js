@@ -16,7 +16,7 @@ productsRouter.get("/sugest", sugestProductHandler);
 productsRouter.post("/", createProductHandler);
 productsRouter.post("/bulk", createBulkProductHandler);
 productsRouter.get("/:id", getProductByIdHandler);
-productsRouter.delete("/:id", deleteProductHandler);
+productsRouter.delete("/", deleteProductHandler);
 productsRouter.put("/:id", updateProductHandler);
 
 module.exports = productsRouter;
