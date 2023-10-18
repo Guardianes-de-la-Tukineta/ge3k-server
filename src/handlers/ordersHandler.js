@@ -2,6 +2,7 @@ const {
   getAllOrders,
   createOrderController,
   updateOrderController,
+  fulfillOrderController,
   getOrdersByCustomerIdController,
   getOrderDetailByOrderIdController,
   deleteOrderById,
@@ -31,6 +32,16 @@ const updateOrderHandler = async (req, res) => {
   try {
     const updateOrder = await updateOrderController(stripeOrderId);
     res.status(200).json(updateOrder);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const fulfillOrderHandler = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const order = await fulfillOrderController(orderId);
+    res.status(200).json(order);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -72,6 +83,7 @@ module.exports = {
   getOrdersHandler,
   createOrdersHandler,
   updateOrderHandler,
+  fulfillOrderHandler,
   getOrdersByCustomerIdHandler,
   getOrderDetailByOrderIdHandler,
   deleteOrderHandler,
