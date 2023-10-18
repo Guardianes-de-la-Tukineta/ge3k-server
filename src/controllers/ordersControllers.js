@@ -165,7 +165,7 @@ const deleteOrderById = async (orderId) => {
   await orderToDelete.destroy();
 };
 
-cron.schedule("*/5 * * * * *", async function () {
+cron.schedule("*/5 * * * *", async function () {
   // Ejecutará la rutina cada 5 minutos
   try {
     const orders = await Order.findAll({ where: { status: "Pending" } }); // Busca las ordenes en estado pendiente
@@ -179,7 +179,7 @@ cron.schedule("*/5 * * * * *", async function () {
           // Si está paga aprueba la orden
           order.status = "Approved";
           await order.save();
-        } else if ((Date.now() - order.createdAt) / 60000 > 1) {
+        } else if ((Date.now() - order.createdAt) / 60000 > 60) {
           // Si no estando paga, la antigüedad de la orden es mayor a 60' la cancela
           order.status = "Cancelled";
           await order.save();
