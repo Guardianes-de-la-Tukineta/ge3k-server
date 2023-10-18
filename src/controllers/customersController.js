@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
 
 const getAllCustomers = async () => {
-  const customers = await Customer.findAll();
+  const customers = await Customer.findAll({paranoid: false});
   return customers;
 };
 
@@ -164,6 +164,14 @@ const updateCustomerByEmail = async (email, updatedData) => {
 
   return customer;
 };
+const restoreCustomerById = async (id) => {
+  const customer = await Customer.findByPk(id, { paranoid: false });
+  if (!customer) {
+    throw new Error('customer no encontrado');
+  }
+  await customer.restore();
+} 
+
 
 module.exports = {
   getAllCustomers,
@@ -174,4 +182,5 @@ module.exports = {
   updateCustomerById,
   getCustomerByEmail,
   updateCustomerByEmail,
+  restoreCustomerById,
 };
