@@ -16,9 +16,9 @@ adminRouter.post('/login', getLoginAccess);
 adminRouter.get('/name/:name', searchAdminByNameHandler);
 adminRouter.get('/email/:email', getAdminByEmailHandler);
 adminRouter.get('/',verifyToken, getAdminHandler);
-adminRouter.post('/', createNewAdminHandler);
-adminRouter.put('/:id', updateAdminByIdHandler);
-adminRouter.delete('/:id', deleteAdminByIdHandler);
-adminRouter.patch('/:id', restoreAdminByIdHandler);
+adminRouter.post('/',verifyToken , createNewAdminHandler);
+adminRouter.put('/:id',verifyToken , updateAdminByIdHandler);
+adminRouter.delete('/:id',verifyToken, deleteAdminByIdHandler);
+adminRouter.patch('/:id',verifyToken , restoreAdminByIdHandler);
 
 module.exports = adminRouter;
