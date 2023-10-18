@@ -5,6 +5,7 @@ const { getCart, deleteBulkCart } = require("../controllers/cartsController");
 const Stripe = require("stripe");
 require("dotenv").config();
 const { STRIPE_KEY } = process.env;
+const cron = require("node-cron");
 
 const stripe = new Stripe(STRIPE_KEY);
 
@@ -23,14 +24,28 @@ const createOrderController = async (
   address,
   status
 ) => {
-  if (!name) {throw Error("Check name")}
-  if (!surname) {throw Error("Check surname")}
-  if (!birthdate) {throw Error("Check birthdate")}
-  if (!email) {throw Error("Check email")}
-  if (!phone) {throw Error("Check phone")}
-  if (!address) {throw Error("Check address")}
-  if (!status) {throw Error("Check status")}
-    
+  if (!name) {
+    throw Error("Check name");
+  }
+  if (!surname) {
+    throw Error("Check surname");
+  }
+  if (!birthdate) {
+    throw Error("Check birthdate");
+  }
+  if (!email) {
+    throw Error("Check email");
+  }
+  if (!phone) {
+    throw Error("Check phone");
+  }
+  if (!address) {
+    throw Error("Check address");
+  }
+  if (!status) {
+    throw Error("Check status");
+  }
+
   //* Se obtiene la información de carrito con la consulta por customerId
   const cart = await getCart(CustomerId);
 
@@ -46,7 +61,9 @@ const createOrderController = async (
   cart.products.forEach((product) => {
     const stock = inStock.find((prod) => prod.id === product.product.id).stock;
     if (product.quantity > stock) {
-      message.push(`${product.product.name} máximo disponible ${stock} unidades`);
+      message.push(
+        `${product.product.name} máximo disponible ${stock} unidades`
+      );
       noStock = true;
     }
   });
@@ -104,15 +121,23 @@ const updateOrderController = async (stripeOrderId) => {
   const { payment_status } = await stripe.checkout.sessions.retrieve(
     stripeOrderId
   );
-
-  if (payment_status !== "paid") {
-    throw Error("Payment error");
-  }
-
   const order = await Order.findOne({ where: { stripeOrderId } });
+  if (payment_status !== "paid") {
+    throw Error("Error de pago");
+  }
   order.status = "Approved";
-  order.save();
+  await order.save();
   return { message: order.status };
+};
+
+const fulfillOrderController = async (orderId) => {
+  const order = await Order.findByPk(orderId);
+  if (order.status === "Approved") {
+    order.status = "Fulfilled";
+    await order.save();
+    return { message: "Orden cumplida" };
+  }
+  return { message: 'El estado actual de la orden debe ser "Approved"' };
 };
 
 //* Se obtienen todas las orders (mediante el customerId)
@@ -140,10 +165,49 @@ const deleteOrderById = async (orderId) => {
   await orderToDelete.destroy();
 };
 
+cron.schedule("*/5 * * * * *", async function () {
+  // Ejecutará la rutina cada 5 minutos
+  try {
+    const orders = await Order.findAll({ where: { status: "Pending" } }); // Busca las ordenes en estado pendiente
+    orders.map(async (order) => {
+      if (order.stripeOrderId) {
+        //Revisa el pago en Stripe de cada una
+        const { payment_status } = await stripe.checkout.sessions.retrieve(
+          order.stripeOrderId
+        );
+        if (payment_status === "paid") {
+          // Si está paga aprueba la orden
+          order.status = "Approved";
+          await order.save();
+        } else if ((Date.now() - order.createdAt) / 60000 > 1) {
+          // Si no estando paga, la antigüedad de la orden es mayor a 60' la cancela
+          order.status = "Cancelled";
+          await order.save();
+          await stripe.checkout.sessions.expire(order.stripeOrderId); // Solicita la expiración del enlace de pago en Stripe
+          // Si se cancela la orden, se devuelven los productos al stock
+          const orderDetail = await OrderDetail.findAll({
+            where: { OrderId: order.id },
+            attributes: ["ProductId", "quantity"],
+          });
+
+          orderDetail.forEach(async (item) => {
+            const product = await Product.findByPk(item.ProductId);
+            product.stock = product.stock + item.quantity;
+            await product.save();
+          });
+        }
+      }
+    });
+  } catch (error) {
+    return error;
+  }
+});
+
 module.exports = {
   getAllOrders,
   createOrderController,
   updateOrderController,
+  fulfillOrderController,
   getOrdersByCustomerIdController,
   getOrderDetailByOrderIdController,
   deleteOrderById,

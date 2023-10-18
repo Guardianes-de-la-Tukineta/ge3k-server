@@ -3,6 +3,7 @@ const {
   getOrdersHandler,
   createOrdersHandler,
   updateOrderHandler,
+  fulfillOrderHandler,
   getOrdersByCustomerIdHandler,
   getOrderDetailByOrderIdHandler,
   deleteOrderHandler,
@@ -13,6 +14,7 @@ const ordersRouter = Router();
 ordersRouter.get("/", getOrdersHandler);
 ordersRouter.post("/", createOrdersHandler);
 ordersRouter.put("/", updateOrderHandler);
+ordersRouter.put("/fulfill", fulfillOrderHandler);
 ordersRouter.get("/customers/:customerId", getOrdersByCustomerIdHandler);
 ordersRouter.get("/detail/:orderId", getOrderDetailByOrderIdHandler);
 ordersRouter.delete("/:id", deleteOrderHandler);
