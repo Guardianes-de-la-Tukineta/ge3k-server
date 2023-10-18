@@ -7,6 +7,7 @@ const {
   updateCustomerHandler,
   getCustomerByEmailHandler,
   updateCustomerByEmailHandler,
+  restoreCustomerByIdHandler
 } = require('../handlers/customersHandler');
 
 const customersRouter = Router();
@@ -18,5 +19,6 @@ customersRouter.delete('/:id', deleteCustomerHandler);
 customersRouter.put('/:id', updateCustomerHandler);
 customersRouter.get('/email/:email', getCustomerByEmailHandler);
 customersRouter.put('/email/:email', updateCustomerByEmailHandler);
+customersRouter.patch('/:id', restoreCustomerByIdHandler);
 
 module.exports = customersRouter;

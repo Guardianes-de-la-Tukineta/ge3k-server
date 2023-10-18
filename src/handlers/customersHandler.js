@@ -7,6 +7,7 @@ const {
   updateCustomerById,
   getCustomerByEmail,
   updateCustomerByEmail,
+  restoreCustomerById,
 } = require('../controllers/customersController');
 
 const getCustomersHandler = async (req, res) => {
@@ -117,6 +118,15 @@ const updateCustomerByEmailHandler = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const restoreCustomerByIdHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await restoreCustomerById(id);
+    res.status(204).json({ message: `Cliente con id ${id} restaurado` });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 module.exports = {
   getCustomersHandler,
@@ -126,4 +136,5 @@ module.exports = {
   updateCustomerHandler,
   getCustomerByEmailHandler,
   updateCustomerByEmailHandler,
+  restoreCustomerByIdHandler
 };
