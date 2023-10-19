@@ -55,6 +55,7 @@ const createSessionController = async (
   const session = await stripe.checkout.sessions.create({
     line_items,
     mode: "payment",
+    invoice_creation: { enabled: true },
     success_url: `${base_url}/success`,
     cancel_url: `${base_url}/cancel`,
     metadata: { CustomerId },
@@ -71,4 +72,12 @@ const createSessionController = async (
   };
 };
 
-module.exports = { createSessionController };
+const getBillController = async (stripeOrderId) => {
+  const { customer } = await stripe.checkout.sessions.retrieve(stripeOrderId);
+  
+  const bills = await stripe.invoices.list({ customer });
+  const urlLastBill = bills.data[0].hosted_invoice_url;
+  return urlLastBill;
+};
+
+module.exports = { createSessionController, getBillController };

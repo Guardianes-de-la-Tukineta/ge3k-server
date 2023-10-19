@@ -1,4 +1,7 @@
-const { createSessionController } = require("../controllers/stripeController");
+const {
+  createSessionController,
+  getBillController,
+} = require("../controllers/stripeController");
 
 const createSessionHandler = async (req, res) => {
   try {
@@ -28,4 +31,14 @@ const createSessionHandler = async (req, res) => {
   }
 };
 
-module.exports = { createSessionHandler };
+const getBillHandler = async (req, res) => {
+  try {
+    const { stripeOrderId } = req.body;
+    const urlLastBill = await getBillController(stripeOrderId);
+    res.status(200).json({ url: urlLastBill });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { createSessionHandler, getBillHandler };
