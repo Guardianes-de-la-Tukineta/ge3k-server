@@ -7,12 +7,12 @@ const env = require('dotenv');
 const loginAdmin = async (email,password) => {
     const admin = await Admin.findOne({ where: { email } });
     if (!admin) {
-      throw new Error('El email no existe');
+      throw new Error('Error de autenticación');
 
     } else {
       const isValid = await bcrypt.compare(password, admin.password);
       if (!isValid) {
-        throw new Error('Contraseña incorrecta');
+        throw new Error('Error de autenticación');
       }
       const token = jwt.sign({ id: admin.id, role:admin.role}, process.env.JWT_SECRET, {
         expiresIn: '1d',
@@ -92,6 +92,19 @@ const createNewAdmin = async (admin) => {
         password: hashedPassword,
       });
     }
+    const updateCCAdminById = async (id, adminData) => {
+
+      const {
+        password,
+      } = adminData;
+      const admin = await Admin.findByPk(id);
+      if (!admin) {
+        throw new Error('Admin no encontrado');
+      }
+      await admin.update({
+        password,
+      });
+    }
     const deleteAdminById = async (id) => {
       const admin = await Admin.findByPk(id);
       if (!admin) {
@@ -116,6 +129,7 @@ module.exports = {
     getAdminByEmail,
     createNewAdmin,
     updateAdminById,
+    updateCCAdminById,
     deleteAdminById,
     restoreAdminById,
 }
