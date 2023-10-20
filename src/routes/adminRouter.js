@@ -18,6 +18,7 @@ adminRouter.get('/email/:email', getAdminByEmailHandler);
 adminRouter.get('/',verifyToken, getAdminHandler);
 adminRouter.post('/',verifyToken , createNewAdminHandler);
 adminRouter.put('/:id',verifyToken , updateAdminByIdHandler);
+adminRouter.put('/cc/:id',verifyToken , updateAdminByIdHandler);
 adminRouter.delete('/:id',verifyToken, deleteAdminByIdHandler);
 adminRouter.patch('/:id',verifyToken , restoreAdminByIdHandler);
 

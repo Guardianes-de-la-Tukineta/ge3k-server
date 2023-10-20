@@ -5,6 +5,7 @@ const {
   getAdminByEmail,
   createNewAdmin,
   updateAdminById,
+  updateCCAdminById,
   deleteAdminById,
   restoreAdminById,
 } = require('../controllers/adminController');
@@ -59,9 +60,6 @@ const {
       res.status(500).json({ error: error.message });
     }
   };
-
-
-
   const createNewAdminHandler = async (req, res) => {
     try {
       const newAdmin = await createNewAdmin(req.body);
@@ -75,6 +73,16 @@ const {
       const { id } = req.params;
       const adminData = req.body;
       await updateAdminById(id, adminData);
+      res.status(204).json({message: 'Admin modificado exitosamente'});
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+  const updateCCAdminByIdHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const adminData = req.body;
+      await updateCCAdminById(id, adminData);
       res.status(204).json({message: 'Admin modificado exitosamente'});
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -107,6 +115,7 @@ module.exports = {
     createNewAdminHandler,
     getLoginAccess,
     updateAdminByIdHandler,
+    updateCCAdminByIdHandler,
     deleteAdminByIdHandler,
     restoreAdminByIdHandler,
 };
