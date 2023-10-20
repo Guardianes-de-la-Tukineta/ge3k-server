@@ -69,49 +69,43 @@ const getRatingsByProductId = async (ProductId) => {
 };
 
 const getRatingsByCustomerId = async (CustomerId) => {
-  try {
-    //* Aquí buscamos los ratings que estén asociados al CustomerId
-    const ratings = await Rating.findAll({
-      where: { CustomerId },
-    });
+  //* Aquí buscamos los ratings que estén asociados al CustomerId
+  const ratings = await Rating.findAll({
+    where: { CustomerId },
+  });
 
-    return ratings;
-  } catch (error) {
-    throw error;
-  }
+  return ratings;
 };
 
 const updateRating = async (CustomerId, ProductId, rating, Comment) => {
-    //* Controlamos que la relación entre Customer y Product exista
-    const customer = await Customer.findByPk(CustomerId);
-    const product = await Product.findByPk(ProductId);
+  //* Controlamos que la relación entre Customer y Product exista
+  const customer = await Customer.findByPk(CustomerId);
+  const product = await Product.findByPk(ProductId);
 
-    if (!customer || !product) {
-      throw new Error('Cliente o Producto NO encontrados');
-    }
+  if (!customer || !product) {
+    throw new Error('Cliente o Producto NO encontrados');
+  }
 
-    //* Chequeamos si ya existe un rating de este CustomerId respecto a este ProductId
-    const existingRating = await Rating.findOne({
-      where: { CustomerId, ProductId },
-    });
+  //* Chequeamos si ya existe un rating de este CustomerId respecto a este ProductId
+  const existingRating = await Rating.findOne({
+    where: { CustomerId, ProductId },
+  });
 
-    if (!existingRating) {
-      throw new Error(
-        'No has creado un rating para este producto previamente.'
-      );
-    }
+  if (!existingRating) {
+    throw new Error('No has creado un rating para este producto previamente.');
+  }
 
-    //* Volvemos a validar el rating
-    if (rating < 1 || rating > 5) {
-      throw new Error('El rating debe estar entre 1 y 5');
-    }
+  //* Volvemos a validar el rating
+  if (rating < 1 || rating > 5) {
+    throw new Error('El rating debe estar entre 1 y 5');
+  }
 
-    //* Y acá es cuando actualizamos el rating existente
-    existingRating.rating = rating;
-    existingRating.Comment = Comment;
-    await existingRating.save();
+  //* Y acá es cuando actualizamos el rating existente
+  existingRating.rating = rating;
+  existingRating.Comment = Comment;
+  await existingRating.save();
 
-    return existingRating;
+  return existingRating;
 };
 
 module.exports = {

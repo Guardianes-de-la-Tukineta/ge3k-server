@@ -22,10 +22,14 @@ const createReviewHandler = async (req, res) => {
   } catch (error) {
     if (error.message === 'Ya has creado un rating para este producto.') {
       //! Acá manejamos la excepción específica cuando ya existe un rating
-      res.status(400).json({ error: error.message });
+      res
+        .status(400)
+        .json({ error: 'Ya has creado un rating para este producto' });
     } else {
       console.error('Error al buscar la conexión o crear la revisión:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
+      res.status(500).json({
+        error: 'No se encontró una relación entre comprador y el producto',
+      });
     }
   }
 };
@@ -35,8 +39,14 @@ const getRatingsByProductIdHandler = async (req, res) => {
 
   try {
     const ratings = await getRatingsByProductId(ProductId);
-
-    res.status(200).json({ ratings });
+    if (ratings.length === 0) {
+      //* Esto es si el productoId aún no recibió calificaciones --> envía un mensaje indicando que el producto no ha sido calificado
+      res
+        .status(200)
+        .json({ message: 'El producto aún no ha sido calificado' });
+    } else {
+      res.status(200).json({ ratings });
+    }
   } catch (error) {
     console.error('Error al buscar los ratings:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
@@ -48,8 +58,14 @@ const getRatingsByCustomerIdHandler = async (req, res) => {
 
   try {
     const ratings = await getRatingsByCustomerId(CustomerId);
-
-    res.status(200).json({ ratings });
+    if (ratings.length === 0) {
+      //* Esto es si el customerId aún no escribió calificaciones --> envía un mensaje indicando que el cliente aún no calificó ningún producto
+      res
+        .status(200)
+        .json({ message: 'El cliente aún no ha calificado ningún producto' });
+    } else {
+      res.status(200).json({ ratings });
+    }
   } catch (error) {
     console.error('Error al buscar los ratings:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
@@ -88,7 +104,6 @@ const updateRatingHandler = async (req, res) => {
     }
   }
 };
-
 
 module.exports = {
   createReviewHandler,
