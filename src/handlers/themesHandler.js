@@ -4,13 +4,15 @@ const {
   createNewTheme,
   getThemeById,
   updateThemeById,
-  deleteThemeById
+  deleteThemeById,
 } = require("../controllers/themesController");
 
 const getThemesHandler = async (req, res) => {
-  const { name } = req.query;
+  const { name, active } = req.query;
   try {
-    const results = name ? await searchThemeByName(name) : await getAllThemes();
+    const results = name
+      ? await searchThemeByName(name)
+      : await getAllThemes(active);
     res.status(200).json(results);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -47,7 +49,6 @@ const getThemeByIdHandler = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const deleteThemeHandler = async (req, res) => {
   try {

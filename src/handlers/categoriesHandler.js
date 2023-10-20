@@ -8,11 +8,11 @@ const {
 } = require('../controllers/categoriesController');
 
 const getCategoriesHandler = async (req, res) => {
-  const { name } = req.query;
+  const { name, active } = req.query;
   try {
     const results = name
       ? await searchCategoryByName(name)
-      : await getAllCategories();
+      : await getAllCategories(active);
     res.status(200).json(results);
   } catch (error) {
     res.status(400).json({ error: error.message });

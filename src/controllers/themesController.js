@@ -1,10 +1,31 @@
-const { Theme } = require("../db");
-const { Op } = require("sequelize");
+const { Theme, Product } = require("../db");
+const { Op, Sequelize } = require("sequelize");
 const { themeFormat } = require("../utils/utils");
 
-const getAllThemes = async () => {
+const getAllThemes = async (active) => {
+  if (active === "yes") {
+    const rawGrouping = await Product.findAll({
+      attributes: [[Sequelize.fn("COUNT", "id"), "products"]],
+      include: [
+        {
+          model: Theme,
+          attributes: ["name", "id"],
+        },
+      ],
+      group: ["Theme.id", "Theme.name", "Product.ThemeId"],
+    });
+
+    const grouping = rawGrouping.map((theme) => {
+      const { id, name } = theme.Theme;
+      const { products } = theme.dataValues;
+      return { id, name, products };
+    });
+
+    return grouping;
+  }
+
   const themes = await Theme.findAll();
-  return themes.map(theme=>themeFormat(theme));
+  return themes.map((theme) => themeFormat(theme));
 };
 
 const searchThemeByName = async (themeName) => {
@@ -37,29 +58,27 @@ const bulkCreateNewTheme = async (themes) => {
 };
 
 const updateThemeById = async (id, themeData) => {
-    const { name} = themeData;
+  const { name } = themeData;
 
-    const theme = await Theme.findByPk(id);
+  const theme = await Theme.findByPk(id);
 
-    if (!theme) {
-      return null; 
-    }
-    if (name) {
-      theme.name = name;
-    }
-    await theme.save();
-    return theme;
+  if (!theme) {
+    return null;
+  }
+  if (name) {
+    theme.name = name;
+  }
+  await theme.save();
+  return theme;
 };
 
 const deleteThemeById = async (id) => {
-
-    const theme = await Theme.findByPk(id);
-    if (!theme) {
-      throw new Error("themeo no encontrado");
-    }
-    await theme.destroy();
+  const theme = await Theme.findByPk(id);
+  if (!theme) {
+    throw new Error("themeo no encontrado");
+  }
+  await theme.destroy();
 };
-
 
 module.exports = {
   getAllThemes,
