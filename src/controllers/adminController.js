@@ -14,11 +14,11 @@ const loginAdmin = async (email,password) => {
       if (!isValid) {
         throw new Error('Contraseña incorrecta');
       }
-      const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ id: admin.id, role:admin.role}, process.env.JWT_SECRET, {
         expiresIn: '1d',
       });
       
-      return { token, adminId: admin.id };
+      return { token, adminId: admin.id ,adminRole: admin.role };
 
 
    

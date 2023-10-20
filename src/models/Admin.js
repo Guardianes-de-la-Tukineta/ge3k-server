@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
 
       },
       email: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -36,13 +36,16 @@ module.exports = (sequelize) => {
         password: {
           type: DataTypes.STRING,
           allowNull: false,
+        }, 
+      role:  {
+            type: DataTypes.ENUM('admin', 'superAdmin'),
+            defaultValue: 'admin',
+       },
+       
         },
-
-      },  
-
         {
             paranoid: true,
-            timestamps: true,
+ 
         }
     );
 };
