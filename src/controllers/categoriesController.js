@@ -1,14 +1,33 @@
-const { Category } = require("../db");
-const { Op } = require("sequelize");
+const { Category, Product } = require("../db");
+const { Op, Sequelize } = require("sequelize");
 const { categoryFormat } = require("../utils/utils");
 
-const getAllCategories = async () => {
+const getAllCategories = async (active) => {
+  if (active === "yes") {
+    const rawGrouping = await Product.findAll({
+      attributes: [[Sequelize.fn("COUNT", "id"), "products"]],
+      include: [
+        {
+          model: Category,
+          attributes: ["name", "id"],
+        },
+      ],
+      group: ["Category.id", "Category.name", "Product.CategoryId"],
+    });
+
+    const grouping = rawGrouping.map((category) => {
+      const { id, name } = category.Category;
+      const { products } = category.dataValues;
+      return { id, name, products };
+    });
+
+    return grouping;
+  }
   const categories = await Category.findAll();
   return categories.map((category) => categoryFormat(category));
 };
 
 const searchCategoryByName = async (categoryName) => {
-
   const results = await Category.findAll({
     where: {
       name: {
@@ -29,7 +48,7 @@ const createNewCategory = async (category) => {
   return newCategory;
 };
 const updateCategoryById = async (id, categoryData) => {
-  const {name} = categoryData;
+  const { name } = categoryData;
 
   const category = await Category.findByPk(id);
 
@@ -39,24 +58,19 @@ const updateCategoryById = async (id, categoryData) => {
   if (name) {
     category.name = name;
   }
- 
+
   await category.save();
 
   return category;
-
-
 };
 const deleteCategoryById = async (id) => {
-    const category = await Category.findByPk(id);
-    if (!category) {
-      throw new Error("categoria no encontrada");
-    }
-    await category.destroy();
-    return { message: "categoria eliminada"
+  const category = await Category.findByPk(id);
+  if (!category) {
+    throw new Error("categoria no encontrada");
   }
+  await category.destroy();
+  return { message: "categoria eliminada" };
 };
-
-
 
 const bulkCreateNewCategory = async (categories) => {
   await Category.bulkCreate(categories);

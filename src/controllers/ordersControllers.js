@@ -148,10 +148,40 @@ const getOrdersByCustomerIdController = async (customerId) => {
 
 //* Se obtiene la orderDetail (utilizando la orderId)
 const getOrderDetailByOrderIdController = async (orderId) => {
-  const orderDetail = await OrderDetail.findAll({
+  // Búsqueda de detalles de orden en tabla OrderDetail incluyendo información de productos de tabla Products
+  const rawOrderDetail = await OrderDetail.findAll({
     where: { OrderId: orderId },
+    attributes: ["price", "quantity"],
+    include: {
+      model: Product,
+      attributes: ["id", "name", "image", "description"],
+    },
   });
-  return orderDetail;
+
+  // Ordenamiento de resultados
+  const products = rawOrderDetail.map((item) => {
+    const { id, name, image, description } = item.Product;
+    const { price, quantity } = item;
+    const subtotal = item.price * item.quantity;
+    return {
+      id,
+      name,
+      description,
+      image,
+      price,
+      quantity,
+      subtotal,
+    };
+  });
+
+  //Cálculo del costo total
+  const initial = 0;
+  const total = products.reduce(
+    (accumulator, product) => accumulator + product.subtotal,
+    initial
+  );
+
+  return { products, total };
 };
 
 //* Se elimina una Orden mediante su ID
