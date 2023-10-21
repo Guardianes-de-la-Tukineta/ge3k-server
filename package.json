@@ -11,6 +11,7 @@
     "author": "Guardianes de la Tuquineta all rigths reserved ® (Grupo 3)",
     "license": "ISC",
     "dependencies": {
+        "@sendgrid/mail": "^7.7.0",
         "axios": "^1.4.0",
         "bcrypt": "^5.1.1",
         "concurrently": "^8.0.1",

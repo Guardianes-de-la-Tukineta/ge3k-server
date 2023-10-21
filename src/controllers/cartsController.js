@@ -61,12 +61,29 @@ const createNewCart = async (CustomerId, ProductId, quantity) => {
 
     return { total };
   } else {
-    throw Error(`Stock insuficiente. Máximo disponible ${stock} unidades.`);
+    const [newCart, created] = await Cart.findOrCreate({
+      where: { CustomerId, ProductId },
+      defaults: { quantity: stock },
+    });
+
+    if (!created) {
+      newCart.quantity = stock;
+      await newCart.save();
+    }
+
+    const total = (await getCart(CustomerId)).total;
+
+    return {
+      message: `Limited stock. Maximum available ${stock} units`,
+      stock,
+      total,
+    };
   }
 };
 
 const createBulkCart = async (CustomerId, products) => {
-  let message = "Productos y cantidades actualizados";
+  const message = "Products and quantities updated";
+  let stockLimit = [];
 
   if (products) {
     const currentCart = await Cart.findAll({
@@ -79,7 +96,7 @@ const createBulkCart = async (CustomerId, products) => {
       if (product.productId && product.quantity) {
         product.ProductId = product.productId;
       } else {
-        throw Error('Deben existir las propiedades "productId" y "quantity"');
+        throw Error('Must exist "productId" and "quantity" properties');
       }
       delete product.productId;
       currentCart.forEach((cart) => {
@@ -103,7 +120,7 @@ const createBulkCart = async (CustomerId, products) => {
       const prodInStock = inStock.find((prod) => prod.id === product.ProductId);
       if (product.quantity > prodInStock.stock) {
         product.quantity = prodInStock.stock;
-        message = "Cantidades actualizadas a stock disponible";
+        stockLimit.push(prodInStock.name);
       }
     });
 
@@ -113,6 +130,10 @@ const createBulkCart = async (CustomerId, products) => {
   }
 
   const cart = await getCart(CustomerId);
+
+  if (stockLimit.length) {
+    return { stockLimit, cart };
+  }
 
   return { message, cart };
 };
