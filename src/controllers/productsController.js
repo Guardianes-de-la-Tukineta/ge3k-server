@@ -93,6 +93,14 @@ const createNewProduct = async (product) => {
     themeName,
   } = product;
 
+  if (discount < 0 || discount > 100) {
+    throw new Error('El descuento debe estar entre 0% y 100%.');
+  }
+
+  if (stock < 0) {
+    throw new Error('El stock no puede ser negativo.');
+  }
+
   const newProduct = await Product.create({
     name,
     price,
@@ -231,6 +239,18 @@ const updateProductById = async (id, productData) => {
 
   if (!product) {
     return null; //* Esto es por si no puede encotnrar el producto
+  }
+
+  if (discount !== undefined) {
+    if (discount < 0 || discount > 100) {
+      throw new Error('El descuento debe estar entre 0% y 100%.');
+    }
+  }
+
+  if (stock !== undefined) {
+    if (stock < 0) {
+      throw new Error('El stock no puede ser negativo.');
+    }
   }
 
   //* Acá lo que hago es que actualice ÚNICAMENTE los campos que le paso
