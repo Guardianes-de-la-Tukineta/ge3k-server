@@ -1,3 +1,4 @@
+const { Rating } = require('../db');
 const {
   getAllProducts,
   createNewProduct,
@@ -7,7 +8,7 @@ const {
   updateProductById,
   restoreProductById,
   sugestProducts,
-} = require("../controllers/productsController");
+} = require('../controllers/productsController');
 
 const getProductsHandler = async (req, res) => {
   const filterObject = req.query;
@@ -26,7 +27,7 @@ const createProductHandler = async (req, res) => {
     const newProduct = await createNewProduct(productData);
 
     return res.status(201).json({
-      message: "Producto creado exitosamente",
+      message: 'Producto creado exitosamente',
       productId: newProduct.id,
     });
   } catch (error) {
@@ -39,7 +40,7 @@ const createBulkProductHandler = async (req, res) => {
   try {
     const bulkData = req.body;
     const bulkNewProduct = createBulkNewProduct(bulkData);
-    res.status(200).json("Productos creados exitosamente");
+    res.status(200).json('Productos creados exitosamente');
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -49,11 +50,19 @@ const getProductByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const productById = await getProductById(id);
+    const product = await getProductById(id);
 
-    return productById
-      ? res.status(200).json(productById)
-      : res.status(404).json({ message: "Producto no encontrado." });
+    if (product) {
+      //* Acá agarro los ratings del producto
+      const ratings = await Rating.findAll({ where: { ProductId: id } });
+
+      //* Metemos los ratings al objeto del producto
+      product.ratings = ratings;
+
+      res.status(200).json(product);
+    } else {
+      res.status(404).json({ message: 'Producto no encontrado.' });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
@@ -82,7 +91,7 @@ const updateProductHandler = async (req, res) => {
         message: `Producto con ID ${id} actualizado exitosamente`,
       });
     } else {
-      res.status(404).json({ message: "Producto no encontrado." });
+      res.status(404).json({ message: 'Producto no encontrado.' });
     }
   } catch (error) {
     console.error(error);

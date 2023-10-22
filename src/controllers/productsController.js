@@ -1,8 +1,8 @@
-const { Product, Category, Theme, OrderDetail } = require("../db");
-const { Op } = require("sequelize");
-const { bulkCreateNewTheme } = require("./themesController");
-const { bulkCreateNewCategory } = require("./categoriesController");
-const { productFormat } = require("../utils/utils");
+const { Product, Category, Theme, OrderDetail } = require('../db');
+const { Op } = require('sequelize');
+const { bulkCreateNewTheme } = require('./themesController');
+const { bulkCreateNewCategory } = require('./categoriesController');
+const { productFormat } = require('../utils/utils');
 
 const getAllProducts = async (filterObject) => {
   const {
@@ -46,15 +46,15 @@ const getAllProducts = async (filterObject) => {
   let order = [];
 
   if (nameOrder) {
-    order = [...order, ["name", nameOrder]];
+    order = [...order, ['name', nameOrder]];
   }
 
   if (priceOrder) {
-    order = [...order, ["price", priceOrder]];
+    order = [...order, ['price', priceOrder]];
   }
 
   let paranoid = true;
-  if (type === "hard") {
+  if (type === 'hard') {
     paranoid = false;
   }
 
@@ -213,10 +213,10 @@ const getProductById = async (id) => {
 const deleteProductById = async (id, type) => {
   const product = await Product.findByPk(id);
   if (!product) {
-    throw new Error("Producto no encontrado");
+    throw new Error('Producto no encontrado');
   }
   let force = false;
-  if (type === "hard") {
+  if (type === 'hard') {
     const bought = await OrderDetail.findOne({ where: { ProductId: id } });
     if (!bought) force = true;
   }
@@ -261,7 +261,7 @@ const updateProductById = async (id, productData) => {
 const restoreProductById = async (productId) => {
   const product = await Product.findByPk(productId, { paranoid: false });
   if (!product) {
-    throw new Error("Producto no encontrado");
+    throw new Error('Producto no encontrado');
   }
   product.restore();
   return product;
@@ -269,7 +269,7 @@ const restoreProductById = async (productId) => {
 
 const sugestProducts = async (sugest) => {
   const products = await Product.findAll({
-    attributes: ["name"],
+    attributes: ['name'],
     where: { name: { [Op.iLike]: `%${sugest}%` } },
     limit: 5,
   });
