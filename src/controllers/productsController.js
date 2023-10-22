@@ -73,13 +73,11 @@ const getAllProducts = async (filterObject) => {
       (pageNumber - 1) * unitsPerPage,
       pageNumber * unitsPerPage
     );
-    console.log('Products after pagination:', products);
     return {
       totalPages,
       products: products.map((product) => productFormat(product)),
     };
   }
-  console.log('Products before return:', products);
   return products.map((product) => productFormat(product));
 };
 
