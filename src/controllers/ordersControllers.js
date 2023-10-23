@@ -1,7 +1,6 @@
 const { Order, OrderDetail, Product } = require("../db");
 const { Op } = require("sequelize");
-const { getCustomerByEmail } = require("../controllers/customersController");
-const { getCart, deleteBulkCart } = require("../controllers/cartsController");
+const { getCart, deleteBulkCart } = require("./cartsController");
 const Stripe = require("stripe");
 require("dotenv").config();
 const { STRIPE_KEY } = process.env;
@@ -126,6 +125,12 @@ const updateOrderController = async (stripeOrderId) => {
     throw Error("Error de pago");
   }
   order.status = "Approved";
+  //Busco el enlace de descarga de la orden
+  const { customer } = await stripe.checkout.sessions.retrieve(stripeOrderId);
+  const bills = await stripe.invoices.list({ customer });
+  const urlLastBill = bills.data[0].hosted_invoice_url;
+  order.urlBill = urlLastBill;
+  //Guardo la orden
   await order.save();
   return { message: order.status };
 };
@@ -208,6 +213,14 @@ cron.schedule("*/5 * * * *", async function () {
         if (payment_status === "paid") {
           // Si está paga aprueba la orden
           order.status = "Approved";
+          //Busco el enlace de descarga de la orden
+          const { customer } = await stripe.checkout.sessions.retrieve(
+            order.stripeOrderId
+          );
+          const bills = await stripe.invoices.list({ customer });
+          const urlLastBill = bills.data[0].hosted_invoice_url;
+          order.urlBill = urlLastBill;
+          //Guardo la orden
           await order.save();
         } else if ((Date.now() - order.createdAt) / 60000 > 60) {
           // Si no estando paga, la antigüedad de la orden es mayor a 60' la cancela

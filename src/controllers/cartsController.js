@@ -82,7 +82,7 @@ const createNewCart = async (CustomerId, ProductId, quantity) => {
 };
 
 const createBulkCart = async (CustomerId, products) => {
-  const message = "Products and quantities updated";
+  const message = "Products and quantities updated in cart";
   let stockLimit = [];
 
   if (products) {
