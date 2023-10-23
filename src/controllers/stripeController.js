@@ -1,6 +1,4 @@
-const { Product, Order } = require("../db");
-const { Op } = require("sequelize");
-const { getCart, deleteBulkCart } = require("./cartsController");
+const { getCart } = require("./cartsController");
 const { createOrderController } = require("./ordersControllers");
 const Stripe = require("stripe");
 require("dotenv").config();
@@ -74,7 +72,7 @@ const createSessionController = async (
 
 const getBillController = async (stripeOrderId) => {
   const { customer } = await stripe.checkout.sessions.retrieve(stripeOrderId);
-  
+
   const bills = await stripe.invoices.list({ customer });
   const urlLastBill = bills.data[0].hosted_invoice_url;
   return urlLastBill;

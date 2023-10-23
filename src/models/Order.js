@@ -45,6 +45,9 @@ module.exports = (sequelize) => {
       stripeOrderId: {
         type: DataTypes.STRING,
       },
+      urlBill: {
+        type: DataTypes.STRING,
+      },
       status: {
         type: DataTypes.ENUM("Pending", "Approved", "Cancelled", "Fulfilled"),
         allowNull: false,
