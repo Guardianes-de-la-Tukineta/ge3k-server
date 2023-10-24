@@ -6,6 +6,7 @@ const getCart = async (CustomerId) => {
   const rawCart = await Cart.findAll({
     where: { CustomerId },
     attributes: ["quantity"],
+    order: [["createdAt", "DESC"]],
     include: [
       {
         model: Product,

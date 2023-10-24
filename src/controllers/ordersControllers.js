@@ -9,7 +9,7 @@ const cron = require("node-cron");
 const stripe = new Stripe(STRIPE_KEY);
 
 const getAllOrders = async () => {
-  const orders = await Order.findAll();
+  const orders = await Order.findAll({ order: [["createdAt", "DESC"]] });
   return orders;
 };
 
@@ -147,7 +147,10 @@ const fulfillOrderController = async (orderId) => {
 
 //* Se obtienen todas las orders (mediante el customerId)
 const getOrdersByCustomerIdController = async (customerId) => {
-  const orders = await Order.findAll({ where: { CustomerId: customerId } });
+  const orders = await Order.findAll({
+    where: { CustomerId: customerId },
+    order: [["createdAt", "DESC"]],
+  });
   return orders;
 };
 
