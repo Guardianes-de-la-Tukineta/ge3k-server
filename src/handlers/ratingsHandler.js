@@ -3,17 +3,19 @@ const {
   getRatingsByProductId,
   getRatingsByCustomerId,
   updateRating,
+  deleteRatingController,
 } = require('../controllers/ratingsController');
 
 const createReviewHandler = async (req, res) => {
-  const { CustomerId, ProductId, rating, Comment } = req.body;
+  const { CustomerId, ProductId, rating, Comment, customerName } = req.body;
 
   try {
     const newRating = await createNewReviewController(
       CustomerId,
       ProductId,
       rating,
-      Comment
+      Comment,
+      customerName
     );
 
     res
@@ -28,7 +30,7 @@ const createReviewHandler = async (req, res) => {
     } else {
       console.error('Error al buscar la conexión o crear la revisión:', error);
       res.status(500).json({
-        error: 'No se encontró una relación entre comprador y el producto',
+        error: error.message,
       });
     }
   }
@@ -105,9 +107,22 @@ const updateRatingHandler = async (req, res) => {
   }
 };
 
+  const deleteRatingHandler = async (req, res) => {
+    const { ratingId, CustomerId } = req.body;
+
+    try {
+      const result = await deleteRatingController(ratingId, CustomerId);
+      res.status(200).json({ message: result });
+    } catch (error) {
+      console.error('Error al eliminar el rating:', error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
 module.exports = {
   createReviewHandler,
   getRatingsByProductIdHandler,
   getRatingsByCustomerIdHandler,
   updateRatingHandler,
+  deleteRatingHandler,
 };
