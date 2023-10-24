@@ -29,24 +29,24 @@ const createNewReviewController = async (
   }
 
   //* Controlamos si existe una Order asociada al CustomerId y ProductId
-  const order = await Order.findOne({
-    where: { CustomerId },
-    include: [
-      {
-        model: OrderDetail,
-        include: [
-          {
-            model: Product,
-            where: { id: ProductId },
-          },
-        ],
-      },
-    ],
-  });
+  // const order = await Order.findOne({
+  //   where: { CustomerId },
+  //   include: [
+  //     {
+  //       model: OrderDetail,
+  //       include: [
+  //         {
+  //           model: Product,
+  //           where: { id: ProductId },
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // });
 
-  if (!order) {
-    throw new Error('No se encontró una conexión');
-  }
+  // if (!order) {
+  //   throw new Error('No se encontró una conexión');
+  // }
 
   //* Recién cuando pasemos todas las validaciones, se crea la revisión (rating)
   const newRating = await Rating.create({
