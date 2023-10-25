@@ -1,4 +1,4 @@
-const { Product, Category, Theme, OrderDetail } = require('../db');
+const { Product, Category, Theme, OrderDetail, Rating, Customer } = require('../db');
 const { Op } = require('sequelize');
 const { bulkCreateNewTheme } = require('./themesController');
 const { bulkCreateNewCategory } = require('./categoriesController');
@@ -213,9 +213,13 @@ const createBulkNewProduct = async (bulkData) => {
 
 const getProductById = async (id) => {
   const product = await Product.findByPk(id, {
-    include: [{ model: Category }, { model: Theme }],
+    include: [
+      { model: Category },
+      { model: Theme },
+      { model: Rating, include: Customer},
+    ],
   });
-  return product ? productFormat(product) : null;
+  return product;
 };
 
 const deleteProductById = async (id, type) => {
