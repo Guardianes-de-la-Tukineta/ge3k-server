@@ -10,6 +10,7 @@ const adminRouter = require("./adminRouter");
 const stripeRouter = require("./stripeRouter");
 const ratingsRoutes = require("../routes/ratingsRouter");
 const mailRouter = require("./mailRouter");
+const statisticRouter = require("./statisticRouter");
 
 const router = Router();
 
@@ -24,5 +25,7 @@ router.use("/admin", adminRouter);
 router.use("/stripe-session", stripeRouter);
 router.use("/ratings", ratingsRoutes);
 router.use("/send-email", mailRouter);
+router.use("/statistics", statisticRouter);
+
 
 module.exports = router;
