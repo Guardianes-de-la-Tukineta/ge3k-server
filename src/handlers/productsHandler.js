@@ -47,17 +47,51 @@ const createBulkProductHandler = async (req, res) => {
 };
 
 const getProductByIdHandler = async (req, res) => {
+  // try {
+  //   const { id } = req.params;
+
+  //   const product = await getProductById(id);
+
+  //   if (product) {
+  //     //* Acá agarro los ratings del producto
+  //     const ratings = await Rating.findAll({ where: { ProductId: id } });
+
+  //     //* Metemos los ratings al objeto del producto
+  //     product.ratings = ratings;
+
+  //     res.status(200).json(product);
+  //   } else {
+  //     res.status(404).json({ message: 'Producto no encontrado.' });
+  //   }
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ error: error.message });
+  // }
+
   try {
     const { id } = req.params;
 
     const product = await getProductById(id);
 
     if (product) {
-      //* Acá agarro los ratings del producto
-      const ratings = await Rating.findAll({ where: { ProductId: id } });
+      if (product.ratings) {
+        const ratings = product.ratings.map((rating) => {
+          const customerName = rating.Customer
+            ? rating.Customer.name
+            : 'Anónimo';
 
-      //* Metemos los ratings al objeto del producto
-      product.ratings = ratings;
+          return {
+            id: rating.id,
+            rating: rating.rating,
+            Comment: rating.Comment,
+            customerId: rating.customerId,
+            productName: product.name,
+            customerName,
+          };
+        });
+
+        product.ratings = ratings;
+      }
 
       res.status(200).json(product);
     } else {
