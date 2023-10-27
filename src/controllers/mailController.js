@@ -1,13 +1,17 @@
-const sgMail = require("@sendgrid/mail");
+const nodemailer = require("nodemailer");
 
 require("dotenv").config();
-const { SGMAIL_KEY } = process.env;
-
-// Configuración de SendGrid con API Key
-sgMail.setApiKey(SGMAIL_KEY);
+const { EMAILPASS } = process.env;
 
 const sendMailController = async (msg) => {
-  const response = await sgMail.send(msg);
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "contact.tukineta@gmail.com",
+      pass: EMAILPASS,
+    },
+  });
+  const response = await transporter.sendMail(msg);
   return response;
 };
 

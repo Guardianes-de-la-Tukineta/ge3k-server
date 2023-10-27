@@ -5,8 +5,8 @@ const sendMailHandler = async (req, res) => {
     const { to, subject, html } = req.body;
     if (to && subject && html) {
       const response = await sendMailController({
-        to,
         from: "contact.tukineta@gmail.com",
+        to,
         subject,
         html,
       });
