@@ -1,5 +1,5 @@
 const sequelize = require('sequelize');
-const { Customer, Order, OrderDetail } = require('../db.js'); 
+const { Customer, Order, OrderDetail} = require('../db.js'); 
 
 const countCustomers = async () => {
     const customers = await Customer.count();
@@ -11,19 +11,24 @@ const countOrders = async () => {
         { status:  ['Approved', 'Fulfilled']} });
     return orders;
 };
-const totalSales = async () => {    
-      const total = await OrderDetail.findAll({
-        attributes: [
-            [sequelize.fn('SUM', sequelize.literal('price * quantity')), 'totalSales'],
-        ],
+
+const totalSales = async () => {
+    const total = await Order.findAll({
+      attributes: [],
+      include: [
+        {
+          model: OrderDetail,
+          attributes: [[sequelize.literal("SUM(price*quantity)"), "totalAmount"]],
+        },
+      ],
+      where: { status: { [sequelize.Op.or]: ["Approved", "Fulfilled"] } },
+      raw: true,
     });
     return total;
-    
-}
-
+    }
 
 module.exports = { 
-    countCustomers,
-    countOrders,
-    totalSales,
+        countCustomers,
+        countOrders,
+        totalSales,
  };
